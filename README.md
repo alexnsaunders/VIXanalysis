@@ -4,15 +4,14 @@ This is the start of VIX Analysis
 
 The Cboe Volatility Index (VIX) is created to reflect investors' view of future expected stock market volatility, is often called the market's "fear gauge," and is considered the world's premier barometer of equity market volatility. Some investors use the VIX to measure the level of risk, fear, or stress in the market when making investment decisions. 
 
-Using this index, I will pursue the answer to the following questions: 
-
+Using this index, I will pursue the answer to the following questions:
 Q1) Can we use VIX to predict future drops of stock prices, and are there any specific types of recession periods that VIX could foresee more easily? 
-
 Q2) Are there more appropriate industries to use VIX for predicting the future drops? 
-
 Q3) Are there any other appropriate characteristics of companies, such as company size, each company geography (ex. Americas, Europe, and Africa), and each company theme (ex. ESG, Value, Growth, and developed, emerging, and frontier markets), to use VIX for predicting future drops?
 
-Data Sources: 1. Daily VIX data provided by Cboe Global Markets, Inc.: https://www.cboe.com/tradable_products/vix/vix_historical_data/ (Links to an external site.) 2. Stock indices data provided by S&P Dow Jones Indices LLC: https://www.spglobal.com/spdji/en/index-finder/ (Links to an external site.) 
+Data Sources:
+1. Daily VIX data provided by Cboe Global Markets, Inc.: https://www.cboe.com/tradable_products/vix/vix_historical_data/
+2. Stock indices data provided by S&P Dow Jones Indices LLC: https://www.spglobal.com/spdji/en/index-finder/
 
 For Q1, we can use the daily VIX data (data sources 1) and the daily S&P 500 index data in the stock indices data (data sources 2). If we calculate the changes in the prices of the S&P 500 index, define the recession periods, and analyze the relationship between the VIX data and the changes in each recession period, we can get the answer for Q1. 
 
