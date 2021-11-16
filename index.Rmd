@@ -1,6 +1,6 @@
 --- 
 title: "VIX Analysis"
-author: "Alex Saunders & Masa Koga"
+author: "Alex Saunders & Masataka Koga"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 ---
