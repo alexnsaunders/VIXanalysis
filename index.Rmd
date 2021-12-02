@@ -7,3 +7,17 @@ site: bookdown::bookdown_site
 
 # Introduction
 
+The Cboe Volatility Index (VIX) is an index based on the prices of options contracts on the S&P500. The S&P 500 is a major index of the market values of the 500 biggest companies listed in the US. 
+
+An option gives the holder the right but not the obligation to buy or sell something in the future. Options on the S&P 500 are cash settled, the difference between the (strike) price of the option and the value at expiry is paid to the holder of the option who will exercise it if it is profitable to do so (called in the money). In seminal work [Black and Scholes](https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_model) showed it is possible to create an option-like payoff by trading the underlying security in a dynamic fashion. The only unknown in this model is the volatility between the time the option is purchased and it expires - by examining market prices and making some assumptions about trading and the process stock prices move this can be solved for and is usually called the implied volatility. 
+
+The VIX was created to summarize these options prices and is an average across a range of strike prices for options expiring in the next 30 days. Some people believe it reflects investors' view of future expected stock market volatility, and is often called the market's "fear gauge". It is considered the world's premier barometer of equity market volatility and some investors use the VIX to measure the level of risk or stress in the market when making investment decisions.
+
+Using this index, we will pursue the answer to the following questions:
+
+Q1) Can we use VIX to predict future drops of stock prices, and are there any specific types of recession periods that VIX could foresee more easily?
+
+Q2) Are there more appropriate industries to use VIX for predicting the future drops?
+
+Q3) Are there any other appropriate characteristics of companies, such as company size, each company geography (ex. Americas, Europe, and Africa), and each company theme (ex. ESG, Value, Growth, and developed, emerging, and frontier markets), to use VIX for predicting future drops?
+
