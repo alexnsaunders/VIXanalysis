@@ -1,2 +1,54 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(lubridate)
+library(tidyverse)
+```
+
 # Data sources
+
+Data Sources: 
+
+1. Daily VIX data provided by Cboe Global Markets, Inc.: https://www.cboe.com/tradable_products/vix/vix_historical_data/ (Links to an external site.) 
+
+2. Stock indices data we took from the Fama-French website https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x 
+
+This provides a rich dataset of daily data for which we can calculate our returns on, the data library includes returns on factors (which can be thought of as important risk characteristics (or covariances) of stock price movements) and various other portfolios such as sectors.
+
+## Data collection
+
+In this section we get the data and process it a little - giving the dates consistent format and converting variable types.
+
+```{r}
+vix = read.csv("https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv")
+
+url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+temp <- tempfile()
+download.file(url,temp)
+ind = read.csv(unz(temp,"10_Industry_Portfolios_Daily.csv"),skip=9,header=TRUE)
+
+url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CSV.zip"
+temp1 <- tempfile()
+download.file(url,temp1)
+ff = read.csv(unz(temp1,"F-F_Research_Data_5_Factors_2x3_daily.CSV"),skip=3,header=TRUE)
+
+vix$DATE = as.Date(vix$DATE,format='%m/%d/%Y')
+ind$DATE = as.Date(ind$X,format='%Y%m%d')
+#recession$DATE = as.Date(recession$date,format='$Y-$d-$m')
+ff$DATE = as.Date(as.character(ff$X),format='%Y%m%d')
+
+chars <- sapply(ind, is.character)
+ind[,chars] <- as.data.frame(apply(ind[,chars],2,as.numeric))
+
+
+```
+
+Now we have the data in an appropriate format for R purposes, we can proceed with some intial diagnostics
+
+```{r}
+df1 <-  merge(vix,ff,by= c("DATE" = "DATE"))
+
+ggplot(df1,aes(CLOSE)) + geom_histogram(binwidth = 1,aes(y = ..density..)) +  geom_density(lwd = 1.5,color="blue") + stat_function(fun = dnorm, args = list(mean = mean(df1$CLOSE),sd = sd(df1$CLOSE)),color = "red", lwd = 1.5)
+```
+
 
