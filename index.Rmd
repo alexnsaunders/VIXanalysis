@@ -21,3 +21,5 @@ Q2) Are there more appropriate industries to use VIX for predicting the future d
 
 Q3) Are there any other appropriate characteristics of companies, such as company size, each company geography (ex. Americas, Europe, and Africa), and each company theme (ex. ESG, Value, Growth, and developed, emerging, and frontier markets), to use VIX for predicting future drops?
 
+
+
