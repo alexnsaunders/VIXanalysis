@@ -1,1 +1,14 @@
 # Results
+
+We now do some analysis of the VIX and the return for the market.Here we see little relationship between daily returns and the level of the VIX - although at extremely high levels there may be a small negative relationship.
+
+```{r}
+
+df <-  merge(vix,ff,by= c("DATE" = "DATE")) #%>% merge(rec_d,by=c("DATE"="DATE"))
+
+ggplot(df,aes(x=CLOSE,y=Mkt.RF)) + geom_point() + geom_smooth()
+
+df1 <- df %>% mutate(bin=cut_width(CLOSE,5))
+ggplot(df1,aes(x=CLOSE,y=Mkt.RF)) + geom_point( alpha = 0.2,shape=1,position = "jitter")  +geom_boxplot(aes(group=bin)) + geom_smooth()
+```
+

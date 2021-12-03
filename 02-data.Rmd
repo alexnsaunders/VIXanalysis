@@ -39,16 +39,36 @@ ff$DATE = as.Date(as.character(ff$X),format='%Y%m%d')
 
 chars <- sapply(ind, is.character)
 ind[,chars] <- as.data.frame(apply(ind[,chars],2,as.numeric))
-
+glimpse(ind)
 
 ```
 
-Now we have the data in an appropriate format for R purposes, we can proceed with some intial diagnostics
+Now we have the data in an appropriate format for R purposes, we can proceed with some initial diagnostics
 
 ```{r}
 df1 <-  merge(vix,ff,by= c("DATE" = "DATE"))
 
 ggplot(df1,aes(CLOSE)) + geom_histogram(binwidth = 1,aes(y = ..density..)) +  geom_density(lwd = 1.5,color="blue") + stat_function(fun = dnorm, args = list(mean = mean(df1$CLOSE),sd = sd(df1$CLOSE)),color = "red", lwd = 1.5)
+```
+
+We see the data for the VIX is far from normally distributed with a rather extreme right skew, suggesting these periods might be time of high option prices (and therefore financial stress)
+
+
+```{r}
+ggplot(df1,aes(Mkt.RF)) + geom_histogram(binwidth = 0.1,aes(y = ..density..)) +  geom_density(lwd = 1.5,color="blue") + stat_function(fun = dnorm, args = list(mean = mean(df1$Mkt.RF),sd = sd(df1$Mkt.RF)),color = "red", lwd = 1.5)
+
+qqnorm(df1$Mkt.RF)
+qqline(df1$Mkt.RF,colour="red")
+shapiro.test(tail(df1$Mkt.RF,-5000))
+```
+
+The data on the overall market also a distribution quite different from normal - in this case the qqplot clearly shows much fatter tails than expected. The result is confirmed with a Shapiro-Wilk test which comfortably rejects the null hypothesis of normality. 
+
+```{r}
+library(GGally)
+df <- tail(ind,2520)
+df = df[!colnames(df) %in% c('X','DATE')]
+ggpairs(df)
 ```
 
 
