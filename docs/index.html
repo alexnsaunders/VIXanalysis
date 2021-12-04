@@ -24,7 +24,7 @@
 <meta name="author" content="Alex Saunders &amp; Masataka Koga" />
 
 
-<meta name="date" content="2021-11-19" />
+<meta name="date" content="2021-12-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -102,10 +102,17 @@
 <div id="header">
 <h1 class="title">VIX Analysis</h1>
 <p class="author"><em>Alex Saunders &amp; Masataka Koga</em></p>
-<p class="date"><em>2021-11-19</em></p>
+<p class="date"><em>2021-12-03</em></p>
 </div>
 <div id="introduction" class="section level1" number="1">
 <h1><span class="header-section-number">Chapter 1</span> Introduction</h1>
+<p>The Cboe Volatility Index (VIX) is an index based on the prices of options contracts on the S&amp;P500. The S&amp;P 500 is a major index of the market values of the 500 biggest companies listed in the US.</p>
+<p>An option gives the holder the right but not the obligation to buy or sell something in the future. Options on the S&amp;P 500 are cash settled, the difference between the (strike) price of the option and the value at expiry is paid to the holder of the option who will exercise it if it is profitable to do so (called in the money). In seminal work <a href="https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_model">Black and Scholes</a> showed it is possible to create an option-like payoff by trading the underlying security in a dynamic fashion. The only unknown in this model is the volatility between the time the option is purchased and it expires - by examining market prices and making some assumptions about trading and the process stock prices move this can be solved for and is usually called the implied volatility.</p>
+<p>The VIX was created to summarize these options prices and is an average across a range of strike prices for options expiring in the next 30 days. Some people believe it reflects investors’ view of future expected stock market volatility, and is often called the market’s “fear gauge”. It is considered the world’s premier barometer of equity market volatility and some investors use the VIX to measure the level of risk or stress in the market when making investment decisions.</p>
+<p>Using this index, we will pursue the answer to the following questions:</p>
+<p>Q1) Can we use VIX to predict future drops of stock prices, and are there any specific types of recession periods that VIX could foresee more easily?</p>
+<p>Q2) Are there more appropriate industries to use VIX for predicting the future drops?</p>
+<p>Q3) Are there any other appropriate characteristics of companies, such as company size, each company geography (ex. Americas, Europe, and Africa), and each company theme (ex. ESG, Value, Growth, and developed, emerging, and frontier markets), to use VIX for predicting future drops?</p>
 
 </div>
             </section>
