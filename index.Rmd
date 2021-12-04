@@ -7,3 +7,18 @@ site: bookdown::bookdown_site
 
 # Introduction
 
+Topics about stock investment are quite crucial for almost all companies, and the Cboe Volatility Index (VIX) is one of the prominent and significant indices in stock trading.
+
+Stockholders own stock corporations and also determine their management policies. Stock price synchronizes the valuation of companies from the time to the future in the stock market. If the trading price of stocks increases, the asset price of shareholders climbs. Therefore, companies are required to manage their business so that the stock value rises and have to pay close attention to it. On the other hand, macroeconomic activities also greatly affect the price, like its recent sharp drop around the world due to the pandemic of Covid-19. Since the stock price is a corporation value including expected future profits, it fluctuates fairly rapidly in response to shifts of the external environment and premise of valuations alters, even if the business details of the individual company has not changed. Thus, for stock investors, forecasts of sudden price movements are quite valuable. However, the macroeconomy is more difficult to predict than individual economic activities because it is the total sum of the individual ones, and the impact of macroeconomy on stock company values is also difficult to evaluate. Additionally, the stock price is linked not directly to the actual effects on companies but to the expected influence of stock market participants. Hence, its sudden changes are very tough to foresee.
+
+One way to more accurately predict this extremely unpredictable and sudden change is to utilize the market volatility estimates of stock market participants, which more directly affect stock prices. The VIX is created to reflect investors' view of future expected stock market volatility, is often called the market's "fear gauge," and is considered the world's premier barometer of equity market volatility. As far as we know, this index is not analyzed enough publicly, especially in the current market situation and in a dynamic way from the past to the current days. We often hear that investors use it to measure the level of risk, fear, or stress in the market when making investment decisions. Using this index, we will pursue the answer to the following questions:
+
+Q1) Can we use VIX to predict future drops of stock prices, and are there any specific types of recession periods that VIX could foresee more easily?
+
+Q2) Are there more appropriate industries to use VIX for predicting the future drops? 
+
+Q3) Are there any other appropriate characteristics of companies, such as company size, each company geography (ex. Americas, Europe, and Africa), and each company theme (ex. ESG, Value, Growth, and developed, emerging, and frontier markets), to use VIX for predicting future drops?
+
+We collected daily VIX data from Cboe Global Markets, Inc. (https://www.cboe.com/tradable_products/vix/vix_historical_data/) and stock indices data from S&P Dow Jones Indices LLC (https://www.spglobal.com/spdji/en/index-finder/).
+
+In the following sections, we will analyze these questions and introduce insights on predicting the stock price fluctuations employing the VIX.
