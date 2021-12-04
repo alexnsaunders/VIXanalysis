@@ -3,6 +3,14 @@
 We now do some analysis of the VIX and the return for the market.Here we see little relationship between daily returns and the level of the VIX - although at extremely high levels there may be a small negative relationship.
 
 ```{r}
+library(tidyverse)
+vix = read.csv("https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv")
+ff = read_csv("ff.csv")
+
+vix$DATE = as.Date(vix$DATE,format='%m/%d/%Y')
+#ind$DATE = as.Date(ind$X,format='%Y%m%d')
+#recession$DATE = as.Date(recession$date,format='$Y-$d-$m')
+ff$DATE = as.Date(as.character(ff$X),format='%Y%m%d')
 
 df <-  merge(vix,ff,by= c("DATE" = "DATE")) #%>% merge(rec_d,by=c("DATE"="DATE"))
 

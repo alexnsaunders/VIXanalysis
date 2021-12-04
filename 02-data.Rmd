@@ -1,10 +1,3 @@
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(dplyr)
-library(lubridate)
-library(tidyverse)
-```
-
 # Data sources
 
 Data Sources: 
@@ -15,22 +8,29 @@ Data Sources:
 
 This provides a rich dataset of daily data for which we can calculate our returns on, the data library includes returns on factors (which can be thought of as important risk characteristics (or covariances) of stock price movements) and various other portfolios such as sectors.
 
-## Data collection
+Data collection
 
 In this section we get the data and process it a little - giving the dates consistent format and converting variable types.
 
 ```{r}
+library(dplyr)
+library(lubridate)
+library(tidyverse)
 vix = read.csv("https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv")
 
-url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
-temp <- tempfile()
-download.file(url,temp)
-ind = read.csv(unz(temp,"10_Industry_Portfolios_Daily.csv"),skip=9,header=TRUE)
+#url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+#temp <- tempfile()
+#download.file(url,temp)
+#ind = read.csv(unz(temp,"10_Industry_Portfolios_Daily.csv"),skip=9,header=TRUE)
+#write_csv(ind),"ind.csv")
+ind = read_csv("ind.csv")
 
-url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CSV.zip"
-temp1 <- tempfile()
-download.file(url,temp1)
-ff = read.csv(unz(temp1,"F-F_Research_Data_5_Factors_2x3_daily.CSV"),skip=3,header=TRUE)
+#url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CS#V.zip"
+#temp1 <- tempfile()
+#download.file(url,temp1)
+#ff = read.csv(unz(temp1,"F-F_Research_Data_5_Factors_2x3_daily.CSV"),skip=3,header=TRUE)
+#write_csv(ff,"ff.csv")
+ff = read_csv("ff.csv")
 
 vix$DATE = as.Date(vix$DATE,format='%m/%d/%Y')
 ind$DATE = as.Date(ind$X,format='%Y%m%d')
