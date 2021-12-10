@@ -20,3 +20,16 @@ df1 <- df %>% mutate(bin=cut_width(CLOSE,5))
 ggplot(df1,aes(x=CLOSE,y=Mkt.RF)) + geom_point( alpha = 0.2,shape=1,position = "jitter")  +geom_boxplot(aes(group=bin)) + geom_smooth()
 ```
 
+
+So we can see a slight correlation - now we look at changes in the VIX vs changes in returns.
+
+```{r}
+
+
+df1 <- df %>% mutate(dVIX=CLOSE - lag(CLOSE))
+ggplot(df1,aes(x=dVIX,y=Mkt.RF)) + geom_point( alpha = 0.2,shape=1,position = "jitter") + geom_smooth()
+
+df2 <- df1 %>% mutate(dVIX_t1=lag(dVIX))
+ggplot(df2,aes(x=dVIX_t1,y=Mkt.RF)) + geom_point( alpha = 0.2,shape=1,position = "jitter") + geom_smooth()
+```
+
