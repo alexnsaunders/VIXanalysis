@@ -281,7 +281,7 @@ ggpairs(df_p) +
   labs(subtitle = "Pairwise Analysis for VIX and Non-positive Return in Each Region")
 ```
 
-The graph below shows that Japanese average stock price is more durable than others, especially after 2010. Even though there were several spread of Covid-19 also in Japan, the stock price fall in 2020 is also smaller than others. It implies the economy is in a bit strange situation. This seems to make sense because Bank Of Japan has bought a lot of financial products consistently to improve its financial markets and economy since 2010.
+In the graph below, as the one above, we multiplied 5 to VIX value and deducted 400 from it to show the value and all returns in one graph. It shows that Japanese average stock price is more durable than others, especially after 2010. Even though there were several spread of Covid-19 also in Japan, the stock price fall in 2020 is also smaller than others. It implies the economy is in a bit strange situation. This seems to make sense because Bank Of Japan has bought a lot of financial products consistently to improve its financial markets and economy since 2010.
 
 ```{r}
 df_V5 <- df %>% mutate(VIX = VIX * 5 - 400)
