@@ -1,6 +1,14 @@
 # Data transformation
 
-In this section we get the data and process it a little - giving the dates consistent format and converting variable types.
+In this section, in addition to giving the dates consistent format and converting variable types, we will process it to analyze the relation between returns and VIX from broader perspectives.
+
+First, to merge the return data in four regions (North America, Europe, Asia ex Japan, and Japan) except for the US, which has a different size of data, in the period after 2001, we cleaned and merged the data as follows: \
+-Read all seven csv files \
+-Rename the column names of "Mkt-RF" into distinct names to avoid name conflicts and to deal with easily because the name with "-" is difficult to select \
+-Select columns we will use in each data \
+-Merge region return data at first because the numbers of their dataset are the same \
+-Change date column in each data into consistent date format \
+-Filter the data from 2001, which includes the period of the 2008 financial crisis \
 
 ```{r}
 library(dplyr)
@@ -15,37 +23,40 @@ erp <- read_csv("Europe_5_Factors_Daily.csv", skip = 6, n_max = 8132)
 asa <- read_csv("Asia_Pacific_ex_Japan_5_Factors_Daily.csv", skip = 6, n_max = 8132)
 jp <- read_csv("Japan_5_Factors_Daily.csv", skip = 6, n_max = 8132)
 
-ff <- ff %>% rename("Mkt.RF" = "Mkt-RF", "X" = "...1")
 ind <- ind %>% rename("X" = "...1")
+ff <- ff %>% rename("Mkt.RF" = "Mkt-RF", "X" = "...1") %>% select(Mkt.RF, X)
 na <- na %>% rename("NA_" = "Mkt-RF", "X" = "...1") %>% select(NA_, X)
 erp <- erp %>% rename("ERP_" = "Mkt-RF", "X" = "...1") %>% select(ERP_, X)
 asa <- asa %>% rename("ASA_" = "Mkt-RF", "X" = "...1") %>% select(ASA_, X)
 jp <- jp %>% rename("JP_" = "Mkt-RF", "X" = "...1") %>% select(JP_, X)
-cnt <- merge(na, erp, by = c("X" = "X")) %>%
+rgn <- merge(na, erp, by = c("X" = "X")) %>%
   merge(asa, by = c("X" = "X")) %>% merge(jp, by = c("X" = "X"))
+vix <- vix %>% select(CLOSE, DATE)
 
 vix$DATE <- as.Date(vix$DATE, format = '%m/%d/%Y')
 ff$DATE <- as.Date(as.character(ff$X), format = '%Y%m%d')
 ind$DATE <- as.Date(as.character(ind$X), format = '%Y%m%d')
-cnt$DATE <- as.Date(as.character(cnt$X), format = '%Y%m%d')
-
-vix <- vix %>% mutate(dVIX = CLOSE - lag(CLOSE))
+rgn$DATE <- as.Date(as.character(rgn$X), format = '%Y%m%d')
 
 vix <- vix %>% filter(year(DATE) >= 2001)
 ff <- ff %>% filter(year(DATE) >= 2001)
 ind <- ind %>% filter(year(DATE) >= 2001)
-cnt <- cnt %>% filter(year(DATE) >= 2001)
+rgn <- rgn %>% filter(year(DATE) >= 2001)
 
+```
+Then, we calculated the stock prices using the return data and added the new columns of price data to describe stock price shifts more clearly than returns, which have lots of ups and downs and are difficult to comprehend how much is the sum of returns. For the calculation of the stock prices, we set the base date on Jan. 2, 2001 and regraded the stock price on the date as 100. We defined the names of stock price value columns as XX_V, such as NA_V for the stock price value data in the North America markets.
+
+```{r}
 ff_n <- nrow(ff)
-cnt_n <- nrow(cnt)
+rgn_n <- nrow(rgn)
 ff$US_V[1] <- 100 * (1 + ff$Mkt.RF[1]/100)
 ind_v <- ind
-cnt_v <- cnt
+rgn_v <- rgn
 for(j in 2:6){
     ind_v[1, j] <- 100 * (1 + ind[1, j]/100)
 }
 for(j in 2:5){
-    cnt_v[1, j] <- 100 * (1 + cnt[1, j]/100)
+    rgn_v[1, j] <- 100 * (1 + rgn[1, j]/100)
 }
 for(i in 2:ff_n){
   ff$US_V[i] <- ff$US_V[i-1] * (1 + ff$Mkt.RF[i]/100)
@@ -53,34 +64,47 @@ for(i in 2:ff_n){
     ind_v[i , j] <- ind_v[i-1, j] * (1 + ind_v[i, j]/100)
   }
 }
-for(i in 2:cnt_n){
+for(i in 2:rgn_n){
   for(j in 2:5){
-    cnt_v[i , j] <- cnt_v[i-1, j] * (1 + cnt_v[i, j]/100)
+    rgn_v[i , j] <- rgn_v[i-1, j] * (1 + rgn_v[i, j]/100)
   }
 }
 
 ind_names <- ind %>% select(-c(X, DATE)) %>% names
-cnt_names <- cnt %>% select(-c(X, DATE)) %>% names
+rgn_names <- rgn %>% select(-c(X, DATE)) %>% names
 names(ind_v) <- c("X", paste(ind_names, "V", sep = "_"), "DATE")
-names(cnt_v) <- c("X", paste(c("NA", "ERP", "ASA", "JP"),
+names(rgn_v) <- c("X", paste(c("NA", "ERP", "ASA", "JP"),
                              "V", sep = "_"), "DATE")
 ind <- merge(ind, ind_v, by = c("DATE" = "DATE"))
-cnt <- merge(cnt, cnt_v, by = c("DATE" = "DATE"))
+rgn <- merge(rgn, rgn_v, by = c("DATE" = "DATE"))
 remove(ind_v)
-remove(cnt_v)
+remove(rgn_v)
+```
 
+Before the merge of VIX, return in each industry, and return in each regions, we set the date in the return datasets which is one trading day after the original date because, on a day i, we want to analyze the VIX's prediction possibility of returns in the next day (i+1). After merging, we renamed the data into short understandable names. Especially, XX_R means that the return data in percentage for XX, such as NA_R.
+
+```{r}
 ff$DATE[1:(ff_n-1)] <- ff$DATE[2:ff_n]
 ind$DATE[1:(ff_n-1)] <- ind$DATE[2:ff_n]
-cnt$DATE[1:(cnt_n-1)] <- cnt$DATE[2:cnt_n]
+rgn$DATE[1:(rgn_n-1)] <- rgn$DATE[2:rgn_n]
 ff <- ff[-ff_n,]
 ind <- ind[-ff_n,]
-cnt <- cnt[-cnt_n,]
+rgn <- rgn[-rgn_n,]
+
 df <- merge(vix, ff, by = c("DATE" = "DATE")) %>%
-  merge(ind, by = c("DATE" = "DATE")) %>% merge(cnt, by = c("DATE" = "DATE"))
+  merge(ind, by = c("DATE" = "DATE")) %>% merge(rgn, by = c("DATE" = "DATE"))
 df <- rename(df, US_R = Mkt.RF, VIX = CLOSE, Cnsmr_R = Cnsmr,
              Manuf_R = Manuf, HiTec_R = HiTec, Hlth_R = Hlth,
              Other_R = Other, NA_R = NA_, ERP_R = ERP_,
              ASA_R = ASA_, JP_R = JP_)
+
+```
+
+Finally, we added new columns for return data, which are the non-positive return data by replacing positive return values with zero. We names these variables as XX_R_n, like NA_R_n which is created from NA_R. Since our goal is to avoid risks by forecasting future drops rather than to earn more by trading in volatile markets, we will focus on the analysis of this non-positive return values. As a result, after excluding excess columns, we now obtained the dataset described below with 31 variables except for the date column and 5197 observations from Jan. 3, 2001 to Aug. 31, 2021.
+
+Note: we set the value on Jan. 2, 2001 as 100 to determine stock price data XX_V, return data XX_R is in percentages, and converted non-positive return data XX_R_n is in non-positive percentages.
+
+```{r}
 df$US_R_n <- df$US_R
 df$Cnsmr_R_n <- df$Cnsmr_R
 df$Manuf_R_n <- df$Manuf_R
@@ -103,30 +127,8 @@ df$ERP_R_n[df$ERP_R > 0] <- 0
 df$ASA_R_n[df$ASA_R > 0] <- 0
 df$JP_R_n[df$JP_R > 0] <- 0
 
-
-ind = read_csv("ind.csv")
-
-#url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CS#V.zip"
-#temp1 <- tempfile()
-#download.file(url,temp1)
-#ff = read.csv(unz(temp1,"F-F_Research_Data_5_Factors_2x3_daily.CSV"),skip=3,header=TRUE)
-#write_csv(ff,"ff.csv")
-ff = read_csv("ff.csv")
-
-ind$DATE = as.Date(ind$X,format='%Y%m%d')
-#recession$DATE = as.Date(recession$date,format='$Y-$d-$m')
-ff$DATE = as.Date(as.character(ff$X),format='%Y%m%d')
-
-df1 <-  merge(vix,ff,by= c("DATE" = "DATE"))
-
-chars <- sapply(ind, is.character)
-ind[,chars] <- as.data.frame(apply(ind[,chars],2,as.numeric))
-
-
-df_base <- df %>% select(VIX, US_R, Cnsmr_R, Manuf_R, HiTec_R, 
-                         Hlth_R, Other_R, NA_R, ERP_R, ASA_R, JP_R)
-
-glimpse(df_base)
+df <- df[,(!str_detect(names(df), "X")) | (str_detect(names(df), "VIX"))]
+glimpse(df)
 
 ```
 

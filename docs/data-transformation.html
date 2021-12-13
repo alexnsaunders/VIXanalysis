@@ -77,7 +77,7 @@
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a>
 <ul>
 <li class="chapter" data-level="2.1" data-path="data-sources.html"><a href="data-sources.html#vix-data"><i class="fa fa-check"></i><b>2.1</b> VIX data</a></li>
-<li class="chapter" data-level="2.2" data-path="data-sources.html"><a href="data-sources.html#stock-indices-data-we-took-from-the-fama-french-website"><i class="fa fa-check"></i><b>2.2</b> Stock indices data we took from the Fama-French website</a></li>
+<li class="chapter" data-level="2.2" data-path="data-sources.html"><a href="data-sources.html#stock-indices-data"><i class="fa fa-check"></i><b>2.2</b> Stock indices data</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
@@ -110,20 +110,53 @@
             <section class="normal" id="section-">
 <div id="data-transformation" class="section level1" number="3">
 <h1><span class="header-section-number">Chapter 3</span> Data transformation</h1>
-<p>In this section we get the data and process it a little - giving the dates consistent format and converting variable types.</p>
+<p>In this section, in addition to giving the dates consistent format and converting variable types, we will process it to analyze the relation between returns and VIX from broader perspectives.</p>
+<p>First, to merge the return data in four regions (North America, Europe, Asia ex Japan, and Japan) except for the US, which has a different size of data, in the period after 2001, we cleaned and merged the data as follows:<br />
+-Read all seven csv files<br />
+-Rename the column names of “Mkt-RF” into distinct names to avoid name conflicts and to deal with easily because the name with “-” is difficult to select<br />
+-Select columns we will use in each data<br />
+-Merge region return data at first because the numbers of their dataset are the same<br />
+-Change date column in each data into consistent date format<br />
+-Filter the data from 2001, which includes the period of the 2008 financial crisis<br />
+</p>
+<p>Then, we calculated the stock prices using the return data and added the new columns of price data to describe stock price shifts more clearly than returns, which have lots of ups and downs and are difficult to comprehend how much is the sum of returns. For the calculation of the stock prices, we set the base date on Jan. 2, 2001 and regraded the stock price on the date as 100. We defined the names of stock price value columns as XX_V, such as NA_V for the stock price value data in the North America markets.</p>
+<p>Before the merge of VIX, return in each industry, and return in each regions, we set the date in the return datasets which is one trading day after the original date because, on a day i, we want to analyze the VIX’s prediction possibility of returns in the next day (i+1). After merging, we renamed the data into short understandable names. Especially, XX_R means that the return data in percentage for XX, such as NA_R.</p>
+<p>Finally, we added new columns for return data, which are the non-positive return data by replacing positive return values with zero. We names these variables as XX_R_n, like NA_R_n which is created from NA_R. Since our goal is to avoid risks by forecasting future drops rather than to earn more by trading in volatile markets, we will focus on the analysis of this non-positive return values. As a result, after excluding excess columns, we now obtained the dataset described below with 31 variables except for the date column and 5197 observations from Jan. 3, 2001 to Aug. 31, 2021.</p>
+<p>Note: we set the value on Jan. 2, 2001 as 100 to determine stock price data XX_V, return data XX_R is in percentages, and converted non-positive return data XX_R_n is in non-positive percentages.</p>
 <pre><code>## Rows: 5,197
-## Columns: 11
-## $ VIX     &lt;dbl&gt; 26.60, 26.97, 28.67, 29.84, 27.99, 26.80, 25.79, 24.56, 25.28,~
-## $ US_R    &lt;dbl&gt; -3.52, 5.39, -1.30, -2.98, -0.36, 0.51, 1.44, 1.39, -0.40, 0.6~
-## $ Cnsmr_R &lt;dbl&gt; -0.74, 2.20, -1.54, -1.52, 0.06, 0.00, 0.22, -0.36, 0.55, 1.57~
-## $ Manuf_R &lt;dbl&gt; -1.59, -1.07, -2.38, -0.40, 1.10, -1.12, 0.35, -0.43, -0.13, 0~
-## $ HiTec_R &lt;dbl&gt; -5.94, 14.21, 0.06, -5.82, -0.33, 2.51, 3.37, 4.32, -0.91, -0.~
-## $ Hlth_R  &lt;dbl&gt; -2.34, -2.59, -4.82, -1.53, -0.89, 2.13, -0.47, -1.49, 1.21, 1~
-## $ Other_R &lt;dbl&gt; -3.71, 5.41, -0.45, -2.28, -0.95, -1.19, 1.27, 0.91, -1.25, 1.~
-## $ NA_R    &lt;dbl&gt; -3.42, 5.14, -1.22, -2.84, -0.31, 0.43, 1.32, 1.39, 0.01, 0.64~
-## $ ERP_R   &lt;dbl&gt; -0.20, -3.38, 3.77, 0.29, -1.52, -1.17, -0.94, 2.50, -0.61, -1~
-## $ ASA_R   &lt;dbl&gt; -0.09, -1.36, 3.45, 1.27, -1.24, -0.39, -0.95, -0.73, -0.27, -~
-## $ JP_R    &lt;dbl&gt; -0.03, 0.67, -1.91, 0.24, 0.30, -2.70, -0.96, -3.07, 0.51, 2.6~</code></pre>
+## Columns: 32
+## $ DATE      &lt;date&gt; 2001-01-03, 2001-01-04, 2001-01-05, 2001-01-08, 2001-01-09,~
+## $ VIX       &lt;dbl&gt; 26.60, 26.97, 28.67, 29.84, 27.99, 26.80, 25.79, 24.56, 25.2~
+## $ US_R      &lt;dbl&gt; -3.52, 5.39, -1.30, -2.98, -0.36, 0.51, 1.44, 1.39, -0.40, 0~
+## $ US_V      &lt;dbl&gt; 96.48000, 101.68027, 100.35843, 97.36775, 97.01722, 97.51201~
+## $ Cnsmr_R   &lt;dbl&gt; -0.74, 2.20, -1.54, -1.52, 0.06, 0.00, 0.22, -0.36, 0.55, 1.~
+## $ Manuf_R   &lt;dbl&gt; -1.59, -1.07, -2.38, -0.40, 1.10, -1.12, 0.35, -0.43, -0.13,~
+## $ HiTec_R   &lt;dbl&gt; -5.94, 14.21, 0.06, -5.82, -0.33, 2.51, 3.37, 4.32, -0.91, -~
+## $ Hlth_R    &lt;dbl&gt; -2.34, -2.59, -4.82, -1.53, -0.89, 2.13, -0.47, -1.49, 1.21,~
+## $ Other_R   &lt;dbl&gt; -3.71, 5.41, -0.45, -2.28, -0.95, -1.19, 1.27, 0.91, -1.25, ~
+## $ Cnsmr_V   &lt;dbl&gt; 99.26000, 101.44372, 99.88149, 98.36329, 98.42231, 98.42231,~
+## $ Manuf_V   &lt;dbl&gt; 98.41000, 97.35701, 95.03992, 94.65976, 95.70101, 94.62916, ~
+## $ HiTec_V   &lt;dbl&gt; 94.0600, 107.4259, 107.4904, 101.2344, 100.9004, 103.4330, 1~
+## $ Hlth_V    &lt;dbl&gt; 97.66000, 95.13061, 90.54531, 89.15997, 88.36644, 90.24865, ~
+## $ Other_V   &lt;dbl&gt; 96.29000, 101.49929, 101.04254, 98.73877, 97.80075, 96.63692~
+## $ NA_R      &lt;dbl&gt; -3.42, 5.14, -1.22, -2.84, -0.31, 0.43, 1.32, 1.39, 0.01, 0.~
+## $ ERP_R     &lt;dbl&gt; -0.20, -3.38, 3.77, 0.29, -1.52, -1.17, -0.94, 2.50, -0.61, ~
+## $ ASA_R     &lt;dbl&gt; -0.09, -1.36, 3.45, 1.27, -1.24, -0.39, -0.95, -0.73, -0.27,~
+## $ JP_R      &lt;dbl&gt; -0.03, 0.67, -1.91, 0.24, 0.30, -2.70, -0.96, -3.07, 0.51, 2~
+## $ NA_V      &lt;dbl&gt; 96.56068, 101.52390, 100.28531, 97.43721, 97.13515, 97.55283~
+## $ ERP_V     &lt;dbl&gt; 99.80998, 96.43640, 100.07206, 100.36226, 98.83676, 97.68037~
+## $ ASA_V     &lt;dbl&gt; 99.92998, 98.57093, 101.97163, 103.26667, 101.98616, 101.588~
+## $ JP_V      &lt;dbl&gt; 99.98999, 100.65993, 98.73732, 98.97429, 99.27121, 96.59089,~
+## $ US_R_n    &lt;dbl&gt; -3.52, 0.00, -1.30, -2.98, -0.36, 0.00, 0.00, 0.00, -0.40, 0~
+## $ Cnsmr_R_n &lt;dbl&gt; -0.74, 0.00, -1.54, -1.52, 0.00, 0.00, 0.00, -0.36, 0.00, 0.~
+## $ Manuf_R_n &lt;dbl&gt; -1.59, -1.07, -2.38, -0.40, 0.00, -1.12, 0.00, -0.43, -0.13,~
+## $ HiTec_R_n &lt;dbl&gt; -5.94, 0.00, 0.00, -5.82, -0.33, 0.00, 0.00, 0.00, -0.91, -0~
+## $ Hlth_R_n  &lt;dbl&gt; -2.34, -2.59, -4.82, -1.53, -0.89, 0.00, -0.47, -1.49, 0.00,~
+## $ Other_R_n &lt;dbl&gt; -3.71, 0.00, -0.45, -2.28, -0.95, -1.19, 0.00, 0.00, -1.25, ~
+## $ NA_R_n    &lt;dbl&gt; -3.42, 0.00, -1.22, -2.84, -0.31, 0.00, 0.00, 0.00, 0.00, 0.~
+## $ ERP_R_n   &lt;dbl&gt; -0.20, -3.38, 0.00, 0.00, -1.52, -1.17, -0.94, 0.00, -0.61, ~
+## $ ASA_R_n   &lt;dbl&gt; -0.09, -1.36, 0.00, 0.00, -1.24, -0.39, -0.95, -0.73, -0.27,~
+## $ JP_R_n    &lt;dbl&gt; -0.03, 0.00, -1.91, 0.00, 0.00, -2.70, -0.96, -3.07, 0.00, 0~</code></pre>
 
 </div>
             </section>

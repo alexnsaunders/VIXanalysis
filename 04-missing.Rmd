@@ -1,6 +1,6 @@
 # Missing values
 
-Since we searched and collected data as clean as possible, there was not any missing data. We checked this using the function built in a previos porblem set.
+Since we searched and collected data as clean as possible, there was not any missing data. We checked this using the function built in the previous problem set. To show the graph clear, we selected only the original data of 12 variables, DATE, VIX, and XX_R, because all other variables were created by them. Also, since the variable names do not have any information in the graph but they overlapped each other, we renamed the variables temporarily into ColXX.
 
 ```{r}
 library(patchwork)
@@ -73,9 +73,11 @@ plot_missing <- function(data, percent = FALSE){
 }
 
 
-df_m <- df_base %>% rename(Col1 = US_R, Col2 = Cnsmr_R, Col3 = Manuf_R,
-                           Col4 = HiTec_R, Col5 = Hlth_R, Col6 = Other_R,
-                           Col7 = NA_R, Col8 = ERP_R, Col9 = ASA_R, Col10 = JP_R)
+df_m <- df %>% select(DATE, VIX, US_R, Cnsmr_R, Manuf_R, HiTec_R, 
+                      Hlth_R, Other_R, NA_R, ERP_R, ASA_R, JP_R) %>% 
+  rename(Col1 = DATE, Col2 = VIX, Col3 = US_R, Col4 = Cnsmr_R,
+         Col5 = Manuf_R, Col6 = HiTec_R, Col7 = Hlth_R, Col8 = Other_R,
+         Col9 = NA_R, Col10 = ERP_R, Col11 = ASA_R, Col12 = JP_R)
 plot_missing(df_m, percent = TRUE)
 ```
 

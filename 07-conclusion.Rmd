@@ -6,7 +6,7 @@ In conclusion, we got answers below.
 
 Q1) Can we use VIX to predict future drops of stock prices, and are there any specific types of recession periods that VIX could foresee more easily?
 
-We can employ it to precdict drops even though the power of prediction is limited in some points. In the more severe financial crisis, the VIX will work.
+We can employ it to predict stock price plunges even though the power of prediction is limited in some points. For example, while in the more severe financial crisis, the VIX works well, the price may recover rapidly even in the period of high VIX.
 
 Q2) Are there more appropriate industries to use VIX for predicting the future drops? 
 
@@ -14,4 +14,8 @@ As far as the analysis on five industry genres in the US market, we could not fi
 
 Q3) Are there any more appropriate regions to use VIX?
 
-The US market is the most appropriate, then Europe and Asia. Japan is the least probably because of the abnormal investment by Bank Of Japan on financial products in Japanese markets.
+The US market is the most appropriate, then Europe and Asia. Japan is the least probably because of the abnormal volume of investment by Bank Of Japan on financial products in Japanese markets.
+
+\
+
+To analyze the possibility of volatility indices more deeply, we can compare other volatility indices, such as the VSMI Volatility index and the Asian VXJ index. There are exponential numbers of possible analyze perspectives combinations, such as research about the difference in different size of companies in different countries in different periods. Also, we felt that it would be possible to create the tool, functions, or set of codes analyzing the relationships between implied volatility data and economic data indicating recession partially automatically from some common thought-provoking perspectives. Since we experienced that there are the room to improve our analysis and many ways to do if time permits, we learned the potential of designing and constructing partial automatic analysis/visual tools or codes step by step from the early point of analysis. Moreover, since the daily trading data was not so large and we could not obtain data enough to analyze deeply, we learned that there are plenty of data to analyze one theme, and data collection and cleansing is one of the significant work in data analysis.

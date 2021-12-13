@@ -42,13 +42,67 @@ ggplot(vix, aes(CLOSE)) +
                 args = list(mean = mean(vix$CLOSE),
                             sd = sd(vix$CLOSE)),
                 color = "red", lwd = 1.5) +
-  labs(subtitle = "Distribution of VIX Daily Values from 1990 to Date",
-       x = "VIX Values", y = "Density")
+  labs(subtitle = "Distribution of VIX Daily Values Jan. 1990 to Nov. 2021",
+       x = "VIX Values", y = "Density") +
+  theme_grey(16)
 
 ```
 
-## Stock indices data we took from the Fama-French website
+## Stock indices data
 
-https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x 
+we took the stock indices data from the website of Kenneth R. French, the Roth Family Distinguished Professor of Finance at the Tuck School of Business, Dartmouth College,  prominent for Fama-French, https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html This is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x 
 
-This provides a rich dataset of daily data for which we can calculate our returns on, the data library includes returns on factors (which can be thought of as important risk characteristics (or covariances) of stock price movements) and various other portfolios such as sectors.
+We selected this source because this provides a rich dataset of daily data on which we can calculate our returns, the data library includes returns on factors (which can be thought of as important risk characteristics (or covariance) of stock price movements) and various other portfolios such as sectors. Moreover, the other sites we checked provided the data only for the last 10 years, which do not include the period of the 2008 financial crisis.
+
+We used the following six dataset (all return data are in percentages) from the website. \
+-5_Industry_Portfolios_Daily.csv \
+-F-F_Research_Data_5_Factors_2x3_daily.csv \
+-North_America_5_Factors_Daily.csv \
+-Europe_5_Factors_Daily.csv \
+-Asia_Pacific_ex_Japan_5_Factors_Daily.csv \
+-Japan_5_Factors_Daily.csv \
+
+5_Industry_Portfolios_Daily.csv has the following return data for five industries of 25105 records from Jul. 1, 1926 to Oct. 29, 2021 at Dec. 1, 2021. We will analyze the all column data in Table 2.2. The industry definitions are as described in Table 2.3.
+
+<div style="text-align: center;">
+Table 2.2: Industry return data columns
+</div>
+|Column Name |Description|
+|:----:|:-------|
+|(No Name) |The date of the return data (num)|
+|Cnsmr   |The return on closing prices of "Cnsmr" industry portfolio (num)|
+|Manuf   |The return on closing prices of "Manuf" industry portfolio (num)|
+|HiTec   |The return on closing prices of "HiTec" industry portfolio (num)|
+|Hlth    |The return on closing prices of "Hlth"  industry portfolio (num)|
+|Other   |The return on closing prices of "Other" industry portfolio (num)|
+
+<div style="text-align: center;">
+Table 2.3: Industry definitions
+</div>
+|Industry Name |Compositions|
+|:----:|:---------------|
+|Cnsmr   |Consumer Durables, Nondurables, Wholesale, Retail, and Some Services Industries, including Laundries and Repair Shops|
+|Manuf   |Manufacturing, Energy, and Utilities Industries|
+|HiTec   |Business Equipment, Telephone and Television Transmission Industries|
+|Hlth    |Healthcare, Medical Equipment, and Drugs Industries|
+|Other   |Mines, Constr, BldMt, Trans, Hotels, Bus Serv, Entertainment, and Finance Industries|
+
+The other five dataset all has the following return data for the market in each region. F-F_Research_Data_5_Factors_2x3_daily.csv has 14685 records for the US market from Jul. 1, 1963 to Oct. 29, 2021, and other four files have 8132 records for the markets in each region from Jul. 2, 1990 to Aug. 31, 2021, at Dec. 1, 2021. We will analyze the all column data in Table 2.2. We only employ Mkt-RF data of the five dataset other than date information. Other columns have the factor and risk free rate data for the fama french 5 factor models and other analysis much more specialized in finance.
+
+<div style="text-align: center;">
+Table 2.4: Other data columns
+</div>
+|Column Name |Description|
+|:----:|:---------------|
+|(No Name) |The date of the return data (num)|
+|Mkt-RF  |The excess value-weight return on the market (num)|
+|SMB     |Small Minus Big factor, the average return on small portfolios minus that on big stock portfolios (num)|
+|HML     |High Minus Low factor, the average return on value portfolios minus the that on growth portfolios (num)|
+|RMW     |Robust Minus Weak, the average return on  robust operating profitability portfolios minus that on weak operating profitability portfolios (num)|
+|CMA     |Conservative Minus Aggressive, the average return on conservative investment portfolios minus that on aggressive investment portfolios (num)|
+|RF   |The risk free rate, the minimum return an investor expects for any investment without any risks (num)|
+
+
+Issues with this dataset: \
+-The data format is a bit different from other dataset, so we need to modify it, while it is clean and must be exactly calculated because the dataset is quite well known. \
+-Although we chose this dataset for the analysis for the period more than ten years, the other dataset would help us find more intriguing findings because the data on this website is more or less limited.

@@ -77,7 +77,7 @@
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a>
 <ul>
 <li class="chapter" data-level="2.1" data-path="data-sources.html"><a href="data-sources.html#vix-data"><i class="fa fa-check"></i><b>2.1</b> VIX data</a></li>
-<li class="chapter" data-level="2.2" data-path="data-sources.html"><a href="data-sources.html#stock-indices-data-we-took-from-the-fama-french-website"><i class="fa fa-check"></i><b>2.2</b> Stock indices data we took from the Fama-French website</a></li>
+<li class="chapter" data-level="2.2" data-path="data-sources.html"><a href="data-sources.html#stock-indices-data"><i class="fa fa-check"></i><b>2.2</b> Stock indices data</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
@@ -155,10 +155,142 @@
 In the graph below, the blue curve is a density curve of the data and the red curve is the density curve of normal distribution with the same mean and the same standard deviation. We can see the data is far from normally distributed with a rather extreme right skew, suggesting traders regarded that the market is not in financial crisis in the most periods.</p>
 <p><img src="finalproj_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
-<div id="stock-indices-data-we-took-from-the-fama-french-website" class="section level2" number="2.2">
-<h2><span class="header-section-number">2.2</span> Stock indices data we took from the Fama-French website</h2>
-<p><a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" class="uri">https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html</a> this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper <a href="https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x" class="uri">https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x</a></p>
-<p>This provides a rich dataset of daily data for which we can calculate our returns on, the data library includes returns on factors (which can be thought of as important risk characteristics (or covariances) of stock price movements) and various other portfolios such as sectors.</p>
+<div id="stock-indices-data" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Stock indices data</h2>
+<p>we took the stock indices data from the website of Kenneth R. French, the Roth Family Distinguished Professor of Finance at the Tuck School of Business, Dartmouth College, prominent for Fama-French, <a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" class="uri">https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html</a> This is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper <a href="https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x" class="uri">https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x</a></p>
+<p>We selected this source because this provides a rich dataset of daily data on which we can calculate our returns, the data library includes returns on factors (which can be thought of as important risk characteristics (or covariance) of stock price movements) and various other portfolios such as sectors. Moreover, the other sites we checked provided the data only for the last 10 years, which do not include the period of the 2008 financial crisis.</p>
+<p>We used the following six dataset (all return data are in percentages) from the website.<br />
+-5_Industry_Portfolios_Daily.csv<br />
+-F-F_Research_Data_5_Factors_2x3_daily.csv<br />
+-North_America_5_Factors_Daily.csv<br />
+-Europe_5_Factors_Daily.csv<br />
+-Asia_Pacific_ex_Japan_5_Factors_Daily.csv<br />
+-Japan_5_Factors_Daily.csv<br />
+</p>
+<p>5_Industry_Portfolios_Daily.csv has the following return data for five industries of 25105 records from Jul. 1, 1926 to Oct. 29, 2021 at Dec. 1, 2021. We will analyze the all column data in Table 2.2. The industry definitions are as described in Table 2.3.</p>
+<div style="text-align: center;">
+<p>Table 2.2: Industry return data columns</p>
+</div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Column Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">(No Name)</td>
+<td align="left">The date of the return data (num)</td>
+</tr>
+<tr class="even">
+<td align="center">Cnsmr</td>
+<td align="left">The return on closing prices of “Cnsmr” industry portfolio (num)</td>
+</tr>
+<tr class="odd">
+<td align="center">Manuf</td>
+<td align="left">The return on closing prices of “Manuf” industry portfolio (num)</td>
+</tr>
+<tr class="even">
+<td align="center">HiTec</td>
+<td align="left">The return on closing prices of “HiTec” industry portfolio (num)</td>
+</tr>
+<tr class="odd">
+<td align="center">Hlth</td>
+<td align="left">The return on closing prices of “Hlth” industry portfolio (num)</td>
+</tr>
+<tr class="even">
+<td align="center">Other</td>
+<td align="left">The return on closing prices of “Other” industry portfolio (num)</td>
+</tr>
+</tbody>
+</table>
+<div style="text-align: center;">
+<p>Table 2.3: Industry definitions</p>
+</div>
+<table>
+<colgroup>
+<col width="27%" />
+<col width="72%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Industry Name</th>
+<th align="left">Compositions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Cnsmr</td>
+<td align="left">Consumer Durables, Nondurables, Wholesale, Retail, and Some Services Industries, including Laundries and Repair Shops</td>
+</tr>
+<tr class="even">
+<td align="center">Manuf</td>
+<td align="left">Manufacturing, Energy, and Utilities Industries</td>
+</tr>
+<tr class="odd">
+<td align="center">HiTec</td>
+<td align="left">Business Equipment, Telephone and Television Transmission Industries</td>
+</tr>
+<tr class="even">
+<td align="center">Hlth</td>
+<td align="left">Healthcare, Medical Equipment, and Drugs Industries</td>
+</tr>
+<tr class="odd">
+<td align="center">Other</td>
+<td align="left">Mines, Constr, BldMt, Trans, Hotels, Bus Serv, Entertainment, and Finance Industries</td>
+</tr>
+</tbody>
+</table>
+<p>The other five dataset all has the following return data for the market in each region. F-F_Research_Data_5_Factors_2x3_daily.csv has 14685 records for the US market from Jul. 1, 1963 to Oct. 29, 2021, and other four files have 8132 records for the markets in each region from Jul. 2, 1990 to Aug. 31, 2021, at Dec. 1, 2021. We will analyze the all column data in Table 2.2. We only employ Mkt-RF data of the five dataset other than date information. Other columns have the factor and risk free rate data for the fama french 5 factor models and other analysis much more specialized in finance.</p>
+<div style="text-align: center;">
+<p>Table 2.4: Other data columns</p>
+</div>
+<table>
+<colgroup>
+<col width="27%" />
+<col width="72%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Column Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">(No Name)</td>
+<td align="left">The date of the return data (num)</td>
+</tr>
+<tr class="even">
+<td align="center">Mkt-RF</td>
+<td align="left">The excess value-weight return on the market (num)</td>
+</tr>
+<tr class="odd">
+<td align="center">SMB</td>
+<td align="left">Small Minus Big factor, the average return on small portfolios minus that on big stock portfolios (num)</td>
+</tr>
+<tr class="even">
+<td align="center">HML</td>
+<td align="left">High Minus Low factor, the average return on value portfolios minus the that on growth portfolios (num)</td>
+</tr>
+<tr class="odd">
+<td align="center">RMW</td>
+<td align="left">Robust Minus Weak, the average return on robust operating profitability portfolios minus that on weak operating profitability portfolios (num)</td>
+</tr>
+<tr class="even">
+<td align="center">CMA</td>
+<td align="left">Conservative Minus Aggressive, the average return on conservative investment portfolios minus that on aggressive investment portfolios (num)</td>
+</tr>
+<tr class="odd">
+<td align="center">RF</td>
+<td align="left">The risk free rate, the minimum return an investor expects for any investment without any risks (num)</td>
+</tr>
+</tbody>
+</table>
+<p>Issues with this dataset:<br />
+-The data format is a bit different from other dataset, so we need to modify it, while it is clean and must be exactly calculated because the dataset is quite well known.<br />
+-Although we chose this dataset for the analysis for the period more than ten years, the other dataset would help us find more intriguing findings because the data on this website is more or less limited.</p>
 
 </div>
 </div>

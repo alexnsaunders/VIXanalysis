@@ -11,7 +11,7 @@ min_R <- min(df$US_R)
 max_R <- max(df$US_R)
 min_ind <- min(df$Cnsmr_R, df$Manuf_R, df$HiTec_R, df$Hlth_R, df$Other_R)
 max_ind <- max(df$Cnsmr_R, df$Manuf_R, df$HiTec_R, df$Hlth_R, df$Other_R)
-min_cnt <- min(df$NA_R, df$ERP_R, df$ASA_R, df$JP_R)
+min_rgn <- min(df$NA_R, df$ERP_R, df$ASA_R, df$JP_R)
 ```
 
 ## VIX Prediction for Future Crisis in Different Time Periods
@@ -51,7 +51,7 @@ ggplot() +
   theme_grey(16)
 ```
 
-The graph below shows comparison between VIX and actual cumulative changes of US average portfolio value. Hereafter, xx_V like US_V means the value data. We can see a high VIX leads to not only high volatility but also huge fall of stock values. Especially, from August 2008 to June 2009 and from February 2020 to February 2021, there are comparably high VIX values and sharp plunges of stock values. Since they are the periods of the 2008 financial crisis and the COVID-19 Crisis, times we know were of great worry and uncertainty in markets, the VIX must be capturing trader's fears.
+The graph below shows comparison between VIX and actual cumulative changes of US average portfolio value. Hereafter, xx_V like US_V means the value data. We can see a high VIX leads to not only high volatility but also huge fall of stock values. Especially, from August 2008 to June 2009 and from February 2020 to February 2021, there are comparably high VIX values and sharp plunges of stock values though the prices recovered quickly within the high VIX periods. Since they are the periods of the 2008 financial crisis and the COVID-19 Crisis, times we know were of great worry and uncertainty in markets, the VIX must be capturing trader's fears.
 
 ```{r}
 df_c <- df %>% select(DATE, US_V, VIX) %>%
@@ -182,7 +182,7 @@ ggplot() +
   theme_grey(16)
 ```
 
-Then, we confirmed boxplots and regression curves in the following graph. While it exhibits strong negative relationships like the above analysis about all US average stock portfolio, especially on 70 or more VIX values, the boxplots did not provide distict differences among industries.
+Then, we confirmed boxplots and regression curves in the following graph. While it exhibits strong negative relationships like the above analysis about all US average stock portfolio, especially on 70 or more VIX values, the boxplots did not provide distinct differences among industries.
 
 ```{r}
 g_c <- ggplot(df, aes(x = VIX, y = Cnsmr_R_n)) +
@@ -321,19 +321,19 @@ The boxplots and regression show that there may the threshold of VIX in 70 or mo
 
 ```{r}
 g_na <- ggplot(df, aes(x = VIX, y = NA_R_n)) +
-  xlim(0, max_VIX) + ylim(min_cnt, 0) +
+  xlim(0, max_VIX) + ylim(min_rgn, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_erp <- ggplot(df, aes(x = VIX, y = ERP_R_n)) +
-  xlim(0, max_VIX) + ylim(min_cnt, 0) +
+  xlim(0, max_VIX) + ylim(min_rgn, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_asa <- ggplot(df, aes(x = VIX, y = ASA_R_n)) +
-  xlim(0, max_VIX) + ylim(min_cnt, 0) +
+  xlim(0, max_VIX) + ylim(min_rgn, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_jp <- ggplot(df, aes(x = VIX, y = JP_R_n)) +
-  xlim(0, max_VIX) + ylim(min_cnt, 0) +
+  xlim(0, max_VIX) + ylim(min_rgn, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_na + g_erp + g_asa + g_jp +
@@ -345,22 +345,22 @@ g_na + g_erp + g_asa + g_jp +
 The abnormality stands out more in the following graph for 2016 to 2021. It shows the market impact of Covid-19 is more powerful in North America and Asia than Europe. On the contrary, the Japanese stock market looks like VIX does not affect the market at all. However, as the pairwise analysis above indicates, there is smaller correlation at high level of significance between Japanese stock returns and VIX values.
 
 ```{r}
-min_cnt_21 <- min(df2021$NA_R, df2021$ERP_R, df2021$ASA_R, df2021$JP_R)
+min_rgn_21 <- min(df2021$NA_R, df2021$ERP_R, df2021$ASA_R, df2021$JP_R)
 
 g_na <- ggplot(df2021, aes(x = VIX, y = NA_R_n)) +
-  xlim(0, max_VIX) + ylim(min_cnt_21, 0) +
+  xlim(0, max_VIX) + ylim(min_rgn_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_erp <- ggplot(df2021, aes(x = VIX, y = ERP_R_n)) +
-  xlim(0, max_VIX) + ylim(min_cnt_21, 0) +
+  xlim(0, max_VIX) + ylim(min_rgn_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_asa <- ggplot(df2021, aes(x = VIX, y = ASA_R_n)) +
-  xlim(0, max_VIX) + ylim(min_cnt_21, 0) +
+  xlim(0, max_VIX) + ylim(min_rgn_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_jp <- ggplot(df2021, aes(x = VIX, y = JP_R_n)) +
-  xlim(0, max_VIX) + ylim(min_cnt_21, 0) +
+  xlim(0, max_VIX) + ylim(min_rgn_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_na + g_erp + g_asa + g_jp +

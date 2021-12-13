@@ -19,6 +19,6 @@ Q2) Are there more appropriate industries to use VIX for predicting the future d
 
 Q3) Are there any more appropriate regions to use VIX?
 
-We collected daily VIX data from Cboe Global Markets, Inc. (https://www.cboe.com/tradable_products/vix/vix_historical_data/) and stock indices data offered on the website Kenneth R. French, the Roth Family Distinguished Professor of Finance at the Tuck School of Business, Dartmouth College, (https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html).
+We collected daily VIX data from Cboe Global Markets, Inc. (https://www.cboe.com/tradable_products/vix/vix_historical_data/) and stock indices data offered on the website of Kenneth R. French, the Roth Family Distinguished Professor of Finance at the Tuck School of Business, Dartmouth College, (https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html).
 
 In the following sections, we will analyze these questions and introduce insights on predicting the stock price fluctuations employing the VIX.
