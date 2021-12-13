@@ -1,8 +1,52 @@
 # Data sources
 
-Data Sources: 
+## VIX data
+```{r}
+library(dplyr)
+library(lubridate)
+library(tidyverse)
+vix = read.csv("https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv")
+```
 
-1. Daily VIX data provided by Cboe Global Markets, Inc.: https://www.cboe.com/tradable_products/vix/vix_historical_data/ (Links to an external site.) 
+Cboe Global Markets, Inc. (Cboe) provides the daily VIX data (VIX_History.csv) in its website, https://www.cboe.com/tradable_products/vix/vix_historical_data/. It is created to reflect investors’ view of future expected stock market volatility, market’s “fear gauge.” Cboe Options Exchange makes the VIX index by S&P 500 index options. Options, ones of the financial derivatives, are the financial products which give buyers the right to buy or sell the underlying financial asset. Since the price of the options are adjusted by traders' forecasts about the underlying asset, which is S&P 500 in the case of S&P 500 index options, it includes the information about volatility of their forecasts.
+
+Though there are lots of data referred as "fear index," such as the VXN index for NASDAQ, the VSTOXX index, the VDAX index, and the VSMI Volatility index for Europe, and the Asian VXJ index for Japan, we chose VIX because it is one of the most famous volatility indices.
+
+VIX_History.csv has the following data of 8038 records from Jan. 2, 1990 to Nov. 30, 2021 at Dec. 1, 2021. We will analyze the VIX value in the Close column because the other data is made based on the values when the market is close.
+
+<div style="text-align: center;">
+Table 2.1: VIX data columns
+</div>
+|Column Name |Description|
+|:----:|:-------|
+|Date   |The date of the VIX value (date)|
+|Open   |The VIX value when the market is open (num)|
+|High   |The highest VIX value on the date    (num)|
+|Low    |The lowest VIX value on the date     (num)|
+|Close  |The VIX value when the market is close (num)|
+
+Issues with this dataset: \
+-The data format is clean and must be exactly calculated based on the accurate S&P 500 data because Cboe is the largest U.S. options exchange market. So, we do not have any problem about the data from this perspective. \
+-The VIX only has the information based on S&P 500. The limited traders in the world would check it. However, this is one of the points we want to analyze on this final project.
+
+The distribution of the VIX Close value: \
+In the graph below, the blue curve is a density curve of the data and the red curve is the density curve of normal distribution with the same mean and the same standard deviation. We can see the data is far from normally distributed with a rather extreme right skew, suggesting traders regarded that the market is not in financial crisis in the most periods.
+
+```{r}
+vix$DATE = as.Date(vix$DATE,format='%m/%d/%Y')
+
+ggplot(vix, aes(CLOSE)) +
+  geom_histogram(binwidth = 1,aes(y = ..density..)) +
+  geom_density(lwd = 1, color="blue") +
+  stat_function(fun = dnorm, alpha = 0.5,
+                args = list(mean = mean(vix$CLOSE),
+                            sd = sd(vix$CLOSE)),
+                color = "red", lwd = 1.5) +
+  labs(subtitle = "Distribution of VIX Daily Values from 1990 to Date",
+       x = "VIX Values", y = "Density")
+
+```
+
 
 2. Stock indices data we took from the Fama-French website https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x 
 
@@ -13,10 +57,7 @@ Data collection
 In this section we get the data and process it a little - giving the dates consistent format and converting variable types.
 
 ```{r}
-library(dplyr)
-library(lubridate)
-library(tidyverse)
-vix = read.csv("https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv")
+
 
 #url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
 #temp <- tempfile()
@@ -32,10 +73,11 @@ ind = read_csv("ind.csv")
 #write_csv(ff,"ff.csv")
 ff = read_csv("ff.csv")
 
-vix$DATE = as.Date(vix$DATE,format='%m/%d/%Y')
 ind$DATE = as.Date(ind$X,format='%Y%m%d')
 #recession$DATE = as.Date(recession$date,format='$Y-$d-$m')
 ff$DATE = as.Date(as.character(ff$X),format='%Y%m%d')
+
+df1 <-  merge(vix,ff,by= c("DATE" = "DATE"))
 
 chars <- sapply(ind, is.character)
 ind[,chars] <- as.data.frame(apply(ind[,chars],2,as.numeric))
@@ -43,15 +85,8 @@ glimpse(ind)
 
 ```
 
-Now we have the data in an appropriate format for R purposes, we can proceed with some initial diagnostics
 
-```{r}
-df1 <-  merge(vix,ff,by= c("DATE" = "DATE"))
 
-ggplot(df1,aes(CLOSE)) + geom_histogram(binwidth = 1,aes(y = ..density..)) +  geom_density(lwd = 1.5,color="blue") + stat_function(fun = dnorm, args = list(mean = mean(df1$CLOSE),sd = sd(df1$CLOSE)),color = "red", lwd = 1.5)
-```
-
-We see the data for the VIX is far from normally distributed with a rather extreme right skew, suggesting these periods might be time of high option prices (and therefore financial stress)
 
 
 ```{r}

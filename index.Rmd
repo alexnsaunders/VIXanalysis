@@ -7,19 +7,18 @@ site: bookdown::bookdown_site
 
 # Introduction
 
-The Cboe Volatility Index (VIX) is an index based on the prices of options contracts on the S&P500. The S&P 500 is a major index of the market values of the 500 biggest companies listed in the US. 
+Stockholders own stock corporations and also determine their management policies. Stock price represents the markets current evaluation of future gains produced by the company.
 
-An option gives the holder the right but not the obligation to buy or sell something in the future. Options on the S&P 500 are cash settled, the difference between the (strike) price of the option and the value at expiry is paid to the holder of the option who will exercise it if it is profitable to do so (called in the money). In seminal work [Black and Scholes](https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_model) showed it is possible to create an option-like payoff by trading the underlying security in a dynamic fashion. The only unknown in this model is the volatility between the time the option is purchased and it expires - by examining market prices and making some assumptions about trading and the process stock prices move this can be solved for and is usually called the implied volatility. 
+If the trading price of stocks increases, then shareholder wealth also directly rises. Therefore, companies are required to manage their business so that the stock value rises and have to pay close attention to it. On the other hand, macroeconomic activities also greatly affect the price, like its recent sharp drop around the world due to the pandemic of Covid-19. Since the stock price is a corporation value including expected future profits, it fluctuates fairly rapidly in response to shifts of the external environment and premise of valuations alters, even if the business details of the individual company has not changed. Thus, for stock investors, forecasts of sudden price movements are quite valuable. However, the macroeconomy is more difficult to predict than individual economic activities because it is the total sum of the individual ones, and the impact of macroeconomy on stock company values is also difficult to evaluate. Additionally, the stock price is linked not directly to the actual effects on companies but to the ones expected by stock market participants. Hence, its sudden changes are very tough to foresee.
 
-The VIX was created to summarize these options prices and is an average across a range of strike prices for options expiring in the next 30 days. Some people believe it reflects investors' view of future expected stock market volatility, and is often called the market's "fear gauge". It is considered the world's premier barometer of equity market volatility and some investors use the VIX to measure the level of risk or stress in the market when making investment decisions.
-
-Using this index, we will pursue the answer to the following questions:
+One way to more accurately predict this extremely unpredictable and sudden change is to utilize the market volatility estimates of stock market participants, which more directly affect stock prices. The VIX is created to reflect investors’ view of future expected stock market volatility, market’s “fear gauge,” and is considered the world’s premier barometer of equity market volatility. As far as we know, this index is not analyzed enough publicly, especially in the current market situation and in a dynamic way from the past to the current days. We often hear that investors use it to measure the level of risk, fear, or stress in the market when making investment decisions. Using this index, we will pursue the answer to the following questions:
 
 Q1) Can we use VIX to predict future drops of stock prices, and are there any specific types of recession periods that VIX could foresee more easily?
 
-Q2) Are there more appropriate industries to use VIX for predicting the future drops?
+Q2) Are there more appropriate industries to use VIX for predicting the future drops? 
 
 Q3) Are there any other appropriate characteristics of companies, such as company size, each company geography (ex. Americas, Europe, and Africa), and each company theme (ex. ESG, Value, Growth, and developed, emerging, and frontier markets), to use VIX for predicting future drops?
 
+We collected daily VIX data from Cboe Global Markets, Inc. (https://www.cboe.com/tradable_products/vix/vix_historical_data/) and stock indices data from S&P Dow Jones Indices LLC (https://www.spglobal.com/spdji/en/index-finder/).
 
-
+In the following sections, we will analyze these questions and introduce insights on predicting the stock price fluctuations employing the VIX.

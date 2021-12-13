@@ -24,7 +24,7 @@
 <meta name="author" content="Alex Saunders &amp; Masataka Koga" />
 
 
-<meta name="date" content="2021-12-03" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -74,7 +74,10 @@
 
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
-<li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
+<li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="data-sources.html"><a href="data-sources.html#vix-data"><i class="fa fa-check"></i><b>2.1</b> VIX data</a></li>
+</ul></li>
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
 <li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
@@ -101,40 +104,80 @@
             <section class="normal" id="section-">
 <div id="data-sources" class="section level1" number="2">
 <h1><span class="header-section-number">Chapter 2</span> Data sources</h1>
-<p>Data Sources:</p>
-<ol style="list-style-type: decimal">
-<li><p>Daily VIX data provided by Cboe Global Markets, Inc.: <a href="https://www.cboe.com/tradable_products/vix/vix_historical_data/" class="uri">https://www.cboe.com/tradable_products/vix/vix_historical_data/</a> (Links to an external site.)</p></li>
-<li><p>Stock indices data we took from the Fama-French website <a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" class="uri">https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html</a> this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper <a href="https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x" class="uri">https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x</a></p></li>
+<div id="vix-data" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> VIX data</h2>
+<p>Cboe Global Markets, Inc. (Cboe) provides the daily VIX data (VIX_History.csv) in its website, <a href="https://www.cboe.com/tradable_products/vix/vix_historical_data/" class="uri">https://www.cboe.com/tradable_products/vix/vix_historical_data/</a>. It is created to reflect investors’ view of future expected stock market volatility, market’s “fear gauge.” Cboe Options Exchange makes the VIX index by S&amp;P 500 index options. Options, ones of the financial derivatives, are the financial products which give buyers the right to buy or sell the underlying financial asset. Since the price of the options are adjusted by traders’ forecasts about the underlying asset, which is S&amp;P 500 in the case of S&amp;P 500 index options, it includes the information about volatility of their forecasts.</p>
+<p>Though there are lots of data referred as “fear index,” such as the VXN index for NASDAQ, the VSTOXX index, the VDAX index, and the VSMI Volatility index for Europe, and the Asian VXJ index for Japan, we chose VIX because it is one of the most famous volatility indices.</p>
+<p>VIX_History.csv has the following data of 8038 records from Jan. 2, 1990 to Nov. 30, 2021 at Dec. 1, 2021. We will analyze the VIX value in the Close column because the other data is made based on the values when the market is close.</p>
+<div style="text-align: center;">
+<p>Table 2.1: VIX data columns</p>
+</div>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Column Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Date</td>
+<td align="left">The date of the VIX value (date)</td>
+</tr>
+<tr class="even">
+<td align="center">Open</td>
+<td align="left">The VIX value when the market is open (num)</td>
+</tr>
+<tr class="odd">
+<td align="center">High</td>
+<td align="left">The highest VIX value on the date (num)</td>
+</tr>
+<tr class="even">
+<td align="center">Low</td>
+<td align="left">The lowest VIX value on the date (num)</td>
+</tr>
+<tr class="odd">
+<td align="center">Close</td>
+<td align="left">The VIX value when the market is close (num)</td>
+</tr>
+</tbody>
+</table>
+<p>Issues with this dataset:<br />
+-The data format is clean and must be exactly calculated based on the accurate S&amp;P 500 data because Cboe is the largest U.S. options exchange market. So, we do not have any problem about the data from this perspective.<br />
+-The VIX only has the information based on S&amp;P 500. The limited traders in the world would check it. However, this is one of the points we want to analyze on this final project.</p>
+<p>The distribution of the VIX Close value:<br />
+In the graph below, the blue curve is a density curve of the data and the red curve is the density curve of normal distribution with the same mean and the same standard deviation. We can see the data is far from normally distributed with a rather extreme right skew, suggesting traders regarded that the market is not in financial crisis in the most periods.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Stock indices data we took from the Fama-French website <a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" class="uri">https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html</a> this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper <a href="https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x" class="uri">https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x</a></li>
 </ol>
 <p>This provides a rich dataset of daily data for which we can calculate our returns on, the data library includes returns on factors (which can be thought of as important risk characteristics (or covariances) of stock price movements) and various other portfolios such as sectors.</p>
 <p>Data collection</p>
 <p>In this section we get the data and process it a little - giving the dates consistent format and converting variable types.</p>
 <pre><code>## Rows: 50,213
 ## Columns: 12
-## $ X     [3m[38;5;246m&lt;dbl&gt;[39m[23m 19260701, 19260702, 19260706, 19260707, 19260708, 19260709, 19260710, 19260712, 19260713, 1926~
-## $ NoDur [3m[38;5;246m&lt;dbl&gt;[39m[23m 0.02, 0.29, 0.24, 0.27, 0.69, -0.39, 0.67, 0.27, -0.46, -0.36, 0.00, 0.11, 0.60, -0.01, -0.45,~
-## $ Durbl [3m[38;5;246m&lt;dbl&gt;[39m[23m -0.28, 1.07, 0.72, 0.06, 0.05, -1.15, 1.23, 0.78, 1.92, 0.65, -0.74, 2.41, 1.22, 0.64, -0.36, ~
-## $ Manuf [3m[38;5;246m&lt;dbl&gt;[39m[23m -0.23, 0.81, 0.22, 0.23, 0.15, -1.10, 0.78, 0.25, 0.74, 0.37, -0.32, 0.92, 0.33, 0.18, -0.79, ~
-## $ Enrgy [3m[38;5;246m&lt;dbl&gt;[39m[23m 0.57, 0.64, 0.17, -0.04, 0.12, -1.60, 0.65, -1.27, 0.37, -0.54, -0.11, 0.50, 0.08, -0.40, -0.5~
-## $ HiTec [3m[38;5;246m&lt;dbl&gt;[39m[23m -0.21, 0.36, 0.47, -0.10, 0.35, -0.73, 0.39, 0.03, 1.64, 0.95, -1.19, 0.76, 0.93, 0.33, -1.26,~
-## $ Telcm [3m[38;5;246m&lt;dbl&gt;[39m[23m -0.02, 0.26, 0.17, 0.32, 0.40, 0.21, 0.07, 0.15, 0.03, -0.01, -0.20, 0.06, -0.16, -0.01, 0.01,~
-## $ Shops [3m[38;5;246m&lt;dbl&gt;[39m[23m -0.01, 0.01, -0.23, -0.58, -0.36, 0.40, 0.52, 0.27, 0.32, 0.25, -0.76, 0.06, 0.75, 0.33, -1.47~
-## $ Hlth  [3m[38;5;246m&lt;dbl&gt;[39m[23m 0.97, 0.13, 0.23, 0.33, 0.91, -0.28, -0.17, 0.22, 0.57, 0.09, -0.45, 0.23, 0.38, -0.78, -0.57,~
-## $ Utils [3m[38;5;246m&lt;dbl&gt;[39m[23m 0.61, 0.47, 0.73, 0.17, -0.20, -0.74, 0.55, 0.23, 0.20, 0.52, -0.38, 0.32, 0.24, 0.29, 0.08, -~
-## $ Other [3m[38;5;246m&lt;dbl&gt;[39m[23m 0.20, 0.10, -0.18, 0.16, 0.39, -0.25, 0.55, 0.37, 0.28, -0.23, -0.59, 0.06, 0.03, -0.28, -0.39~
-## $ DATE  [3m[38;5;246m&lt;date&gt;[39m[23m 1926-07-01, 1926-07-02, 1926-07-06, 1926-07-07, 1926-07-08, 1926-07-09, 1926-07-10, 1926-07-1~</code></pre>
-<p>Now we have the data in an appropriate format for R purposes, we can proceed with some initial diagnostics</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p>We see the data for the VIX is far from normally distributed with a rather extreme right skew, suggesting these periods might be time of high option prices (and therefore financial stress)</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-5-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+## $ X     &lt;dbl&gt; 19260701, 19260702, 19260706, 19260707, 19260708, 19260709, 1926~
+## $ NoDur &lt;dbl&gt; 0.02, 0.29, 0.24, 0.27, 0.69, -0.39, 0.67, 0.27, -0.46, -0.36, 0~
+## $ Durbl &lt;dbl&gt; -0.28, 1.07, 0.72, 0.06, 0.05, -1.15, 1.23, 0.78, 1.92, 0.65, -0~
+## $ Manuf &lt;dbl&gt; -0.23, 0.81, 0.22, 0.23, 0.15, -1.10, 0.78, 0.25, 0.74, 0.37, -0~
+## $ Enrgy &lt;dbl&gt; 0.57, 0.64, 0.17, -0.04, 0.12, -1.60, 0.65, -1.27, 0.37, -0.54, ~
+## $ HiTec &lt;dbl&gt; -0.21, 0.36, 0.47, -0.10, 0.35, -0.73, 0.39, 0.03, 1.64, 0.95, -~
+## $ Telcm &lt;dbl&gt; -0.02, 0.26, 0.17, 0.32, 0.40, 0.21, 0.07, 0.15, 0.03, -0.01, -0~
+## $ Shops &lt;dbl&gt; -0.01, 0.01, -0.23, -0.58, -0.36, 0.40, 0.52, 0.27, 0.32, 0.25, ~
+## $ Hlth  &lt;dbl&gt; 0.97, 0.13, 0.23, 0.33, 0.91, -0.28, -0.17, 0.22, 0.57, 0.09, -0~
+## $ Utils &lt;dbl&gt; 0.61, 0.47, 0.73, 0.17, -0.20, -0.74, 0.55, 0.23, 0.20, 0.52, -0~
+## $ Other &lt;dbl&gt; 0.20, 0.10, -0.18, 0.16, 0.39, -0.25, 0.55, 0.37, 0.28, -0.23, -~
+## $ DATE  &lt;date&gt; 1926-07-01, 1926-07-02, 1926-07-06, 1926-07-07, 1926-07-08, 192~</code></pre>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-6-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
 <pre><code>## 
 ##  Shapiro-Wilk normality test
 ## 
 ## data:  tail(df1$Mkt.RF, -5000)
 ## W = 0.881, p-value &lt; 2.2e-16</code></pre>
 <p>The data on the overall market also a distribution quite different from normal - in this case the qqplot clearly shows much fatter tails than expected. The result is confirmed with a Shapiro-Wilk test which comfortably rejects the null hypothesis of normality.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 
+</div>
 </div>
             </section>
 

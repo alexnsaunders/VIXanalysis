@@ -1,23 +1,573 @@
 # Results
 
-We now do some analysis of the VIX and the return for the market.Here we see little relationship between daily returns and the level of the VIX - although at extremely high levels there may be a small negative relationship.
-
 ```{r}
 library(tidyverse)
-vix = read.csv("https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv")
-ff = read_csv("ff.csv")
+library(patchwork)
+library(lubridate)
 
-vix$DATE = as.Date(vix$DATE,format='%m/%d/%Y')
-#ind$DATE = as.Date(ind$X,format='%Y%m%d')
-#recession$DATE = as.Date(recession$date,format='$Y-$d-$m')
-ff$DATE = as.Date(as.character(ff$X),format='%Y%m%d')
+vix <- read.csv("https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv")
+ff <- read_csv("F-F_Research_Data_Factors_daily.csv", skip = 3, n_max = 25105)
+ind <- read_csv("5_Industry_Portfolios_Daily.csv", skip = 9, n_max = 25105)
+na <- read_csv("North_America_5_Factors_Daily.csv", skip = 6, n_max = 8132)
+erp <- read_csv("Europe_5_Factors_Daily.csv", skip = 6, n_max = 8132)
+asa <- read_csv("Asia_Pacific_ex_Japan_5_Factors_Daily.csv", skip = 6, n_max = 8132)
+jp <- read_csv("Japan_5_Factors_Daily.csv", skip = 6, n_max = 8132)
 
-df <-  merge(vix,ff,by= c("DATE" = "DATE")) #%>% merge(rec_d,by=c("DATE"="DATE"))
+ff <- ff %>% rename("Mkt.RF" = "Mkt-RF", "X" = "...1")
+ind <- ind %>% rename("X" = "...1")
+na <- na %>% rename("NA_" = "Mkt-RF", "X" = "...1") %>% select(NA_, X)
+erp <- erp %>% rename("ERP_" = "Mkt-RF", "X" = "...1") %>% select(ERP_, X)
+asa <- asa %>% rename("ASA_" = "Mkt-RF", "X" = "...1") %>% select(ASA_, X)
+jp <- jp %>% rename("JP_" = "Mkt-RF", "X" = "...1") %>% select(JP_, X)
+cnt <- merge(na, erp, by = c("X" = "X")) %>%
+  merge(asa, by = c("X" = "X")) %>% merge(jp, by = c("X" = "X"))
 
-ggplot(df,aes(x=CLOSE,y=Mkt.RF)) + geom_point() + geom_smooth()
+vix$DATE <- as.Date(vix$DATE, format = '%m/%d/%Y')
+ff$DATE <- as.Date(as.character(ff$X), format = '%Y%m%d')
+ind$DATE <- as.Date(as.character(ind$X), format = '%Y%m%d')
+cnt$DATE <- as.Date(as.character(cnt$X), format = '%Y%m%d')
 
-df1 <- df %>% mutate(bin=cut_width(CLOSE,5))
-ggplot(df1,aes(x=CLOSE,y=Mkt.RF)) + geom_point( alpha = 0.2,shape=1,position = "jitter")  +geom_boxplot(aes(group=bin)) + geom_smooth()
+vix <- vix %>% mutate(dVIX = CLOSE - lag(CLOSE))
+
+vix <- vix %>% filter(year(DATE) >= 2001)
+ff <- ff %>% filter(year(DATE) >= 2001)
+ind <- ind %>% filter(year(DATE) >= 2001)
+cnt <- cnt %>% filter(year(DATE) >= 2001)
+
+ff_n <- nrow(ff)
+cnt_n <- nrow(cnt)
+ff$SP500_Value[1] <- 100 * (1 + ff$Mkt.RF[1]/100)
+ind_v <- ind
+cnt_v <- cnt
+for(j in 2:6){
+    ind_v[1, j] <- 100 * (1 + ind[1, j]/100)
+}
+for(j in 2:5){
+    cnt_v[1, j] <- 100 * (1 + cnt[1, j]/100)
+}
+for(i in 2:ff_n){
+  ff$SP500_Value[i] <- ff$SP500_Value[i-1] * (1 + ff$Mkt.RF[i]/100)
+  for(j in 2:6){
+    ind_v[i , j] <- ind_v[i-1, j] * (1 + ind_v[i, j]/100)
+  }
+}
+for(i in 2:cnt_n){
+  for(j in 2:5){
+    cnt_v[i , j] <- cnt_v[i-1, j] * (1 + cnt_v[i, j]/100)
+  }
+}
+
+ind_names <- ind %>% select(-c(X, DATE)) %>% names
+cnt_names <- cnt %>% select(-c(X, DATE)) %>% names
+names(ind_v) <- c("X", paste(ind_names, "Value", sep = "_"), "DATE")
+names(cnt_v) <- c("X", paste(c("NA", "ERP", "ASA", "JP"),
+                             "Value", sep = "_"), "DATE")
+ind <- merge(ind, ind_v, by = c("DATE" = "DATE"))
+cnt <- merge(cnt, cnt_v, by = c("DATE" = "DATE"))
+remove(ind_v)
+remove(cnt_v)
+
+ff$DATE[1:(ff_n-1)] <- ff$DATE[2:ff_n]
+ind$DATE[1:(ff_n-1)] <- ind$DATE[2:ff_n]
+cnt$DATE[1:(cnt_n-1)] <- cnt$DATE[2:cnt_n]
+ff <- ff[-ff_n,]
+ind <- ind[-ff_n,]
+cnt <- cnt[-cnt_n,]
+df <- merge(vix, ff, by = c("DATE" = "DATE")) %>%
+  merge(ind, by = c("DATE" = "DATE")) %>% merge(cnt, by = c("DATE" = "DATE"))
+df <- rename(df, SP500_Return = Mkt.RF, VIX = CLOSE, Cnsmr_Return = Cnsmr,
+             Manuf_Return = Manuf, HiTec_Return = HiTec, Hlth_Return = Hlth,
+             Other_Return = Other, NA_Return = NA_, ERP_Return = ERP_,
+             ASA_Return = ASA_, JP_Return = JP_)
+df$SP500_Return_n <- df$SP500_Return
+df$Cnsmr_Return_n <- df$Cnsmr_Return
+df$Manuf_Return_n <- df$Manuf_Return
+df$HiTec_Return_n <- df$HiTec_Return
+df$Hlth_Return_n <- df$Hlth_Return
+df$Other_Return_n <- df$Other_Return
+df$NA_Return_n <- df$NA_Return
+df$ERP_Return_n <- df$ERP_Return
+df$ASA_Return_n <- df$ASA_Return
+df$JP_Return_n <- df$JP_Return
+
+df$SP500_Return_n[df$SP500_Return > 0] <- 0
+df$Cnsmr_Return_n[df$Cnsmr_Return > 0] <- 0
+df$Manuf_Return_n[df$Manuf_Return > 0] <- 0
+df$HiTec_Return_n[df$HiTec_Return > 0] <- 0
+df$Hlth_Return_n[df$Hlth_Return > 0] <- 0
+df$Other_Return_n[df$Other_Return > 0] <- 0
+df$NA_Return_n[df$NA_Return > 0] <- 0
+df$ERP_Return_n[df$ERP_Return > 0] <- 0
+df$ASA_Return_n[df$ASA_Return > 0] <- 0
+df$JP_Return_n[df$JP_Return > 0] <- 0
+
+max_VIX <- max(df$VIX)
+max_dVIX <- max(df$dVIX)
+min_Return <- min(df$SP500_Return)
+max_Return <- max(df$SP500_Return)
+```
+Q1) Can we use VIX to predict future drops of stock prices, and are there any specific types of recession periods that VIX could foresee more easily?
+
+```{r}
+df_c <- df %>% select(SP500_Return, DATE, VIX) %>%
+  gather(key, Value, -DATE)
+ggplot() +
+  annotate("rect", xmin = as.Date("2002-7-1"), xmax = as.Date("2003-6-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  annotate("rect", xmin = as.Date("2008-8-15"), xmax = as.Date("2009-7-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  annotate("rect", xmin = as.Date("2011-7-1"), xmax = as.Date("2012-2-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  annotate("rect", xmin = as.Date("2020-2-1"), xmax = as.Date("2021-3-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  layer(
+    data = df_c, 
+    mapping = aes(DATE, Value, col = key), 
+    geom = "line", 
+    stat = "identity", 
+    position = "identity"
+  ) +
+  geom_smooth(df, mapping = aes(DATE, VIX),
+              method = "loess", span = 0.1, colour = "red") +
+  labs(subtitle = "Comparison of SP500_Return and VIX")
+```
+
+```{r}
+df_c <- df %>% select(DATE, SP500_Value, VIX) %>%
+  gather(key, Value, -DATE)
+ggplot() +
+  layer(
+    data = df_c, 
+    mapping = aes(DATE, Value, col = key), 
+    geom = "line", 
+    stat = "identity", 
+    position = "identity"
+  ) +
+  geom_smooth(df, mapping = aes(DATE, VIX),
+              method = "loess", span = 0.1, colour = "red") +
+  labs(subtitle = "Comparison of SP500_Value and VIX")
+```
+
+
+```{r}
+df <- df %>% mutate(bin = cut_width(VIX, 5))
+
+ggplot(df, aes(x = VIX, y = SP500_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+```
+
+```{r}
+ggplot(df, aes(x = VIX, y = SP500_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+```
+```{r}
+df2006 <- df %>% filter(year(DATE) <= 2006)
+df2011 <- df %>% filter(year(DATE) > 2006 & year(DATE) <= 2011)
+df2016 <- df %>% filter(year(DATE) > 2011 & year(DATE) <= 2016)
+df2021 <- df %>% filter(year(DATE) > 2016)
+
+g_06 <- ggplot(df2006, aes(x = VIX, y = SP500_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2001-2006")
+g_11 <- ggplot(df2011, aes(x = VIX, y = SP500_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2006-2011")
+g_16 <- ggplot(df2016, aes(x = VIX, y = SP500_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2011-2016")
+g_21 <- ggplot(df2021, aes(x = VIX, y = SP500_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2016-2021")
+g_06 + g_11 + g_16 + g_21
+```
+
+```{r}
+g_06 <- ggplot(df2006, aes(x = VIX, y = SP500_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, max_Return) + labs(subtitle = "2001-2006")
+g_11 <- ggplot(df2011, aes(x = VIX, y = SP500_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, max_Return) + labs(subtitle = "2006-2011")
+g_16 <- ggplot(df2016, aes(x = VIX, y = SP500_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, max_Return) + labs(subtitle = "2011-2016")
+g_21 <- ggplot(df2021, aes(x = VIX, y = SP500_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, max_Return) + labs(subtitle = "2016-2021")
+g_06 + g_11 + g_16 + g_21
+```
+
+Q2) Are there more appropriate industries to use VIX for predicting the future drops? 
+```{r}
+df_V5 <- df %>% mutate(VIX = VIX * 5 - 400)
+df_c <- df_V5 %>% select(DATE, Cnsmr_Value, Manuf_Value, HiTec_Value,
+                      Hlth_Value, Other_Value, VIX) %>%
+  gather(key, Value, -DATE)
+ggplot() +
+  annotate("rect", xmin = as.Date("2002-7-1"), xmax = as.Date("2003-6-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  annotate("rect", xmin = as.Date("2008-8-15"), xmax = as.Date("2009-7-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  annotate("rect", xmin = as.Date("2011-7-1"), xmax = as.Date("2012-2-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  annotate("rect", xmin = as.Date("2020-2-1"), xmax = as.Date("2021-3-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  layer(
+    data = df_c, 
+    mapping = aes(DATE, Value, col = key, alpha = 0.8), 
+    geom = "line", 
+    stat = "identity", 
+    position = "identity"
+  ) +
+  geom_smooth(df_V5, mapping = aes(DATE, VIX),
+              method = "loess", span = 0.1, colour = "red") +
+  labs(subtitle = "Comparison of SP500_Value and VIX") +
+  theme_grey(16)
+```
+```{r}
+# Cnsmr_Return
+# Manuf_Return
+# HiTec_Return
+# Hlth_Return
+# Other_Return
+g_c <- ggplot(df, aes(x = VIX, y = Cnsmr_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_m <- ggplot(df, aes(x = VIX, y = Manuf_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_hi <- ggplot(df, aes(x = VIX, y = HiTec_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_hl <- ggplot(df, aes(x = VIX, y = Hlth_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_o <- ggplot(df, aes(x = VIX, y = Other_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_c + g_m + g_hi + g_hl + g_o
+
+```
+
+```{r}
+g_c <- ggplot(df, aes(x = VIX, y = Cnsmr_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_m <- ggplot(df, aes(x = VIX, y = Manuf_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_hi <- ggplot(df, aes(x = VIX, y = HiTec_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_hl <- ggplot(df, aes(x = VIX, y = Hlth_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_o <- ggplot(df, aes(x = VIX, y = Other_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_c + g_m + g_hi + g_hl + g_o
+```
+```{r}
+g_c <- ggplot(df2006, aes(x = VIX, y = Cnsmr_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_m <- ggplot(df2006, aes(x = VIX, y = Manuf_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_hi <- ggplot(df2006, aes(x = VIX, y = HiTec_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_hl <- ggplot(df2006, aes(x = VIX, y = Hlth_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_o <- ggplot(df2006, aes(x = VIX, y = Other_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_c + g_m + g_hi + g_hl + g_o
+```
+
+```{r}
+g_06 <- ggplot(df2006, aes(x = VIX, y = Cnsmr_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2001-2006")
+g_11 <- ggplot(df2011, aes(x = VIX, y = Cnsmr_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2006-2011")
+g_16 <- ggplot(df2016, aes(x = VIX, y = Cnsmr_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2011-2016")
+g_21 <- ggplot(df2021, aes(x = VIX, y = Cnsmr_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2016-2021")
+g_06 + g_11 + g_16 + g_21
+```
+
+```{r}
+# Cnsmr_Return
+# Manuf_Return
+# HiTec_Return
+# Hlth_Return
+# Other_Return
+# library(GGally)
+# df2021_p <- df2021[names(df2021) %in% c("VIX", "Cnsmr_Return",
+#                                         "Manuf_Return","HiTec_Return",
+#                                         "Hlth_Return", "Other_Return")]
+# ggpairs(df2021_p)
+```
+
+
+
+Q3) Are there any other appropriate characteristics of companies, such as company size, each company geography (ex. Americas, Europe, and Africa), and each company theme (ex. ESG, Value, Growth, and developed, emerging, and frontier markets), to use VIX for predicting future drops?
+```{r}
+df_V5 <- df %>% mutate(VIX = VIX * 5 - 400)
+df_c <- df_V5 %>% select(DATE, NA_Value, ERP_Value, ASA_Value,
+                         JP_Value, VIX) %>% gather(key, Value, -DATE)
+ggplot() +
+  annotate("rect", xmin = as.Date("2002-7-1"), xmax = as.Date("2003-6-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  annotate("rect", xmin = as.Date("2008-8-15"), xmax = as.Date("2009-7-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  annotate("rect", xmin = as.Date("2011-7-1"), xmax = as.Date("2012-2-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  annotate("rect", xmin = as.Date("2020-2-1"), xmax = as.Date("2021-3-1"),
+           ymin = -Inf, ymax = Inf, fill = "green", alpha = 0.2) +
+  layer(
+    data = df_c, 
+    mapping = aes(DATE, Value, col = key, alpha = 0.8), 
+    geom = "line", 
+    stat = "identity", 
+    position = "identity"
+  ) +
+  geom_smooth(df_V5, mapping = aes(DATE, VIX),
+              method = "loess", span = 0.1, colour = "red") +
+  labs(subtitle = "Comparison of SP500_Value and VIX") +
+  theme_grey(16)
+```
+```{r}
+# Cnsmr_Return
+# Manuf_Return
+# HiTec_Return
+# Hlth_Return
+# Other_Return
+g_na <- ggplot(df, aes(x = VIX, y = NA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_erp <- ggplot(df, aes(x = VIX, y = ERP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_asa <- ggplot(df, aes(x = VIX, y = ASA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_jp <- ggplot(df, aes(x = VIX, y = JP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_na + g_erp + g_asa + g_jp
+
+```
+
+```{r}
+g_na <- ggplot(df, aes(x = VIX, y = NA_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_erp <- ggplot(df, aes(x = VIX, y = ERP_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_asa <- ggplot(df, aes(x = VIX, y = ASA_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_jp <- ggplot(df, aes(x = VIX, y = JP_Return)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth()
+g_na + g_erp + g_asa + g_jp
+```
+
+```{r}
+g_na <- ggplot(df2006, aes(x = VIX, y = NA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "North America_2001-2006")
+g_erp <- ggplot(df2006, aes(x = VIX, y = ERP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Europe_2001-2006")
+g_asa <- ggplot(df2006, aes(x = VIX, y = ASA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Asia_2001-2006")
+g_jp <- ggplot(df2006, aes(x = VIX, y = JP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Japan_2001-2006")
+g_na + g_erp + g_asa + g_jp
+
+```
+```{r}
+g_na <- ggplot(df2011, aes(x = VIX, y = NA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "North America_2006-2011")
+g_erp <- ggplot(df2011, aes(x = VIX, y = ERP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Europe_2006-2011")
+g_asa <- ggplot(df2011, aes(x = VIX, y = ASA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Asia_2006-2011")
+g_jp <- ggplot(df2011, aes(x = VIX, y = JP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Japan_2006-2011")
+g_na + g_erp + g_asa + g_jp
+
+```
+```{r}
+g_na <- ggplot(df2016, aes(x = VIX, y = NA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "North America_2011-2016")
+g_erp <- ggplot(df2016, aes(x = VIX, y = ERP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Europe_2011-2016")
+g_asa <- ggplot(df2016, aes(x = VIX, y = ASA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Asia_2011-2016")
+g_jp <- ggplot(df2016, aes(x = VIX, y = JP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Japan_2011-2016")
+g_na + g_erp + g_asa + g_jp
+
+```
+```{r}
+g_na <- ggplot(df2021, aes(x = VIX, y = NA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "North America_2016-2021")
+g_erp <- ggplot(df2021, aes(x = VIX, y = ERP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Europe_2016-2021")
+g_asa <- ggplot(df2021, aes(x = VIX, y = ASA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Asia_2016-2021")
+g_jp <- ggplot(df2021, aes(x = VIX, y = JP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  labs(subtitle = "Japan_2016-2021")
+g_na + g_erp + g_asa + g_jp
+
+```
+
+```{r}
+g_06 <- ggplot(df2006, aes(x = VIX, y = NA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2001-2006")
+g_11 <- ggplot(df2011, aes(x = VIX, y = NA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2006-2011")
+g_16 <- ggplot(df2016, aes(x = VIX, y = NA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2011-2016")
+g_21 <- ggplot(df2021, aes(x = VIX, y = NA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2016-2021")
+g_06 + g_11 + g_16 + g_21
+```
+
+
+```{r}
+g_06 <- ggplot(df2006, aes(x = VIX, y = ERP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2001-2006")
+g_11 <- ggplot(df2011, aes(x = VIX, y = ERP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2006-2011")
+g_16 <- ggplot(df2016, aes(x = VIX, y = ERP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2011-2016")
+g_21 <- ggplot(df2021, aes(x = VIX, y = ERP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2016-2021")
+g_06 + g_11 + g_16 + g_21
+```
+
+```{r}
+g_06 <- ggplot(df2006, aes(x = VIX, y = ASA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2001-2006")
+g_11 <- ggplot(df2011, aes(x = VIX, y = ASA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2006-2011")
+g_16 <- ggplot(df2016, aes(x = VIX, y = ASA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2011-2016")
+g_21 <- ggplot(df2021, aes(x = VIX, y = ASA_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2016-2021")
+g_06 + g_11 + g_16 + g_21
+```
+
+```{r}
+g_06 <- ggplot(df2006, aes(x = VIX, y = JP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2001-2006")
+g_11 <- ggplot(df2011, aes(x = VIX, y = JP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2006-2011")
+g_16 <- ggplot(df2016, aes(x = VIX, y = JP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2011-2016")
+g_21 <- ggplot(df2021, aes(x = VIX, y = JP_Return_n)) +
+  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
+  geom_boxplot(aes(group = bin)) + geom_smooth() +
+  xlim(0, max_VIX) + ylim(min_Return, 0) + labs(subtitle = "2016-2021")
+g_06 + g_11 + g_16 + g_21
+```
+
+```{r}
+# Cnsmr_Return
+# Manuf_Return
+# HiTec_Return
+# Hlth_Return
+# Other_Return
+library(GGally)
+df2021_p <- df2021[names(df2021) %in% c("VIX", "NA_Return",
+                                        "ERP_Return","ASA_Return",
+                                        "JP_Return")]
+ggpairs(df2021_p)
 ```
 
 
@@ -26,10 +576,10 @@ So we can see a slight correlation - now we look at changes in the VIX vs change
 ```{r}
 
 
-df1 <- df %>% mutate(dVIX=CLOSE - lag(CLOSE))
-ggplot(df1,aes(x=dVIX,y=Mkt.RF)) + geom_point( alpha = 0.2,shape=1,position = "jitter") + geom_smooth()
+df1 <- df %>% mutate(dVIX=VIX - lag(VIX))
+ggplot(df1,aes(x=dVIX,y=SP500_Return)) + geom_point( alpha = 0.2,shape=1,position = "jitter") + geom_smooth()
 
 df2 <- df1 %>% mutate(dVIX_t1=lag(dVIX))
-ggplot(df2,aes(x=dVIX_t1,y=Mkt.RF)) + geom_point( alpha = 0.2,shape=1,position = "jitter") + geom_smooth()
+ggplot(df2,aes(x=dVIX_t1,y=SP500_Return)) + geom_point( alpha = 0.2,shape=1,position = "jitter") + geom_smooth()
 ```
 
