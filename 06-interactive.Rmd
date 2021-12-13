@@ -1,9 +1,5 @@
 # Interactive component
 
-    <meta charset="utf-8">
-    <title>Scatter Bar Chart</title>
-    <script src="https://d3js.org/d3.v7.js"></script>
-
  <h1>    Scatter plot for VIX vs the US Stock Market</h1> 
  
   <div id="my_dataviz"></div>
@@ -12,10 +8,12 @@
   <button type="button" onclick="remove()">Next Day</button>
   
   <p> Click on an observation to put date on the scatter  </p>
-   <p> Button shows contemporanous (same day returns vs VIX changes) and next day - Linear regression functionality from <a href="https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097>"> Harry Stevens</a> </p>
+   <p> Button shows contemporaneous (same day returns vs VIX changes) and next day - Linear regression functionality from <a href="https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097>"> Harry Stevens</a> </p>
    
 
-  <script>
+<script src="https://d3js.org/d3.v7.js"></script>
+  
+<script>
 
 // set the dimensions and margins of the graph
   var margin = {top: 10, right: 30, bottom: 30, left: 60},
@@ -270,7 +268,7 @@ function calcLinear(data, x, y, minX, minY){
   }
 
 }
-
+</script>
 
 
 
