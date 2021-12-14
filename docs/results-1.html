@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 5 Results | VIX Analysis</title>
-  <meta name="description" content="Chapter 5 Results | VIX Analysis" />
+  <title>Chapter 6 Results | VIX Analysis</title>
+  <meta name="description" content="Chapter 6 Results | VIX Analysis" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 5 Results | VIX Analysis" />
+  <meta property="og:title" content="Chapter 6 Results | VIX Analysis" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 5 Results | VIX Analysis" />
+  <meta name="twitter:title" content="Chapter 6 Results | VIX Analysis" />
   
   
   
@@ -24,14 +24,14 @@
 <meta name="author" content="Alex Saunders &amp; Masataka Koga" />
 
 
-<meta name="date" content="2021-12-14" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="missing-values.html"/>
+<link rel="prev" href="results.html"/>
 <link rel="next" href="interactive-component.html"/>
 <script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -87,8 +87,14 @@
 <li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#analysis-of-relations-between-industries-and-vix"><i class="fa fa-check"></i><b>5.2</b> Analysis of Relations Between Industries and VIX</a></li>
 <li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#analysis-of-relations-between-regions-and-vix"><i class="fa fa-check"></i><b>5.3</b> Analysis of Relations Between Regions and VIX?</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
-<li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
+<li class="chapter" data-level="6" data-path="results-1.html"><a href="results-1.html"><i class="fa fa-check"></i><b>6</b> Results</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="results-1.html"><a href="results-1.html#vix-prediction-for-future-crisis-in-different-time-periods-1"><i class="fa fa-check"></i><b>6.1</b> VIX Prediction for Future Crisis in Different Time Periods</a></li>
+<li class="chapter" data-level="6.2" data-path="results-1.html"><a href="results-1.html#analysis-of-relations-between-industries-and-vix-1"><i class="fa fa-check"></i><b>6.2</b> Analysis of Relations Between Industries and VIX</a></li>
+<li class="chapter" data-level="6.3" data-path="results-1.html"><a href="results-1.html#analysis-of-relations-between-regions-and-vix-1"><i class="fa fa-check"></i><b>6.3</b> Analysis of Relations Between Regions and VIX?</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>7</b> Interactive component</a></li>
+<li class="chapter" data-level="8" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>8</b> Conclusion</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 </ul>
@@ -108,44 +114,44 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="results" class="section level1" number="5">
-<h1><span class="header-section-number">Chapter 5</span> Results</h1>
-<div id="vix-prediction-for-future-crisis-in-different-time-periods" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> VIX Prediction for Future Crisis in Different Time Periods</h2>
-<p>To analyze the VIX and average stock return data in US markets, we first compared them in the graph below. The blue line shows VIX value, the red curve is the non-parametric loess smoother for VIX value, the swinging line around zero represents US average portfolio return (%), and the periods colored by green indicate high VIX periods. Hereafter, xx_R like US_R means the return data. This graph clearly shows that high VIX leads to high volatility of the US average stock return. Especially, a very high VIX causes intense fluctuations of the return.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<p>The graph below shows comparison between VIX and actual cumulative changes of US average portfolio value. Hereafter, xx_V like US_V means the value data. We can see a high VIX leads to not only high volatility but also huge fall of stock values. Especially, from August 2008 to June 2009 and from February 2020 to February 2021, there are comparably high VIX values and sharp plunges of stock values. Since they are the periods of the 2008 financial crisis and the COVID-19 Crisis, times we know were of great worry and uncertainty in markets, the VIX must be capturing trader’s fears.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
-<p>The next graph with boxplots and a regression curve tells us implications about concrete threshold of VIX values indicating the high level of concerns in the market. US_R_n on y axis is non-positive values of US average stock returns, which means the US average stock returns whose positive values were changed to zero. We focused on these non-positive values because our goal is to confirm the possibility of using the VIX to avoid investment risks, not to improve total trading return. The graph indicates clear negative correlation with narrow confidence interval between the return and VIX. Also, the boxplots imply that above 70 or more VIX values have strong potential of market crisis. This implication makes sense because only the 2008 financial crisis and the COVID-19 Crisis caused such a high values from 2001 to date.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<div id="results-1" class="section level1" number="6">
+<h1><span class="header-section-number">Chapter 6</span> Results</h1>
+<div id="vix-prediction-for-future-crisis-in-different-time-periods-1" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> VIX Prediction for Future Crisis in Different Time Periods</h2>
+<p>To analyze the VIX and average stock return data in US markets, we first compared them in the graph below. The blue line shows VIX value, the red curve is the non-parametric loess smoother for VIX value, the swinging line around zero represents US average portfolio return (%), and the periods colored by green indicate high VIX time range. Hereafter, xx_R like US_R means the return data. This graph clearly shows that high VIX leads to high volatility on the US average stock return. Especially, more highly VIX causes intense fluctuations of the return.
+<img src="finalproj_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p>Then, the graph below shows comparison between VIX and actual cumulative changes of US average portfolio value. Hereafter, xx_V like US_V means the value data. We can see high VIX leads to not only high volatility but also huge fall of stock values. Especially, from August 2008 to June 2009 and from February 2020 to February 2021, there are comparably high VIX values and sharpe plunges of stock values. Since they are the periods of the 2008 financial crisis and the COVID-19 Crisis, there must be the existence of trader’s fears for markets.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<p>The next graph with boxplots and regression curve tells us implications about concrete threshold of VIX values indicating the high level of concerns in the market. US_R_n on y axis is non-positive values of US average stock returns, which means the US average stock returns whose positive values were changed to zero. We basically focused on this non-positive values because our goal is to confirm the possibility of VIX usages to avoid investment risks, not to improve total trading return. The graph indicates clear negative correlation with narrow confidence interval between the return and VIX. Also, the boxplots imply that about 70 or more VIX values have strong potential of market crisis. This implication makes sense because only the 2008 financial crisis and the COVID-19 Crisis caused such a high values from 2001 to date.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p>The following graph shows boxplots and regression of non-positive returns of US average portfolio on VIX values in four time periods with 5 year durations, 2001 to 2006, 2007 to 2011, 2012 to 2016, and 2017 to 2021. The all four periods have both relatively high VIX values and low values, and their graphs show negative relations. On the other hand, we can confirm that there are clear difference of average VIX values among the four periods. 2001 to 2006 and 2012 to 2016 do not have values higher than implicated threshold (70). However, in the two periods, 40 or more VIX leads to return falls, while around 60 or more seems to be threshold in 2007 to 2011 and 2017 to 2021. We can guess that the threshold may change in different financial circumstances because people are getting used to the bad situation when it longs. In high VIX periods, traders may not be surprised by high volatility of stock values. Additionally, we think that they probably cannot avoid to trade because investment is their work even when the risk is a bit high.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 </div>
-<div id="analysis-of-relations-between-industries-and-vix" class="section level2" number="5.2">
-<h2><span class="header-section-number">5.2</span> Analysis of Relations Between Industries and VIX</h2>
+<div id="analysis-of-relations-between-industries-and-vix-1" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> Analysis of Relations Between Industries and VIX</h2>
 <p>To analyze stock returns in different industries, we analyzed the return data on industries’ value-weight market portfolio in the US. They represent the average market returns in each of 5 industries, Cnsmr, Manuf, HiTec, Hlth, and Other. Cnsmr means the industry comprised of Consumer Durables, Nondurables, Wholesale, Retail, and Some Services, such as Laundries and Repair Shops. Manuf includes Manufacturing, Energy, and Utilities, HiTec indicates Business Equipment, Telephone and Television Transmission, and Hlth contains Healthcare, Medical Equipment, and Drugs. Other consists of Mines, Constr, BldMt, Trans, Hotels, Bus Serv, Entertainment, and Finance.</p>
 <p>The below graph created by the ggpairs function in GGally package shows scatter plots, density distribution, and correlations between the VIX and the returns in each industry. Here, XXX_R_n means that the return is converted to non-positive values as US_R_n. We can see the high correlation between each industry and VIX. While the graph shows HiTec and Other have stonger relation with VIX than Cnsmr, Manuf, and Hlth, other information can be read by only this.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
 <p>The below graph shows changes of VIX and cumulative changes of average portfolio value in each industry in the US. Here, since the purpose of the graph is not to confirm actual VIX value but to compare it with the returns, we multiplied 5 to VIX value and deducted 400 from it to show the value and all returns in one graph. From this graph, we could not obtain useful characteristics to conclude that there are the differences of relations VIX and the returns in each industry.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
 <p>Then, we confirmed boxplots and regression curves in the following graph. While it exhibits strong negative relationships like the above analysis about all US average stock portfolio, especially on 70 or more VIX values, the boxplots did not provide distict differences among industries.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 <p>Although we attempted to describe the original return data with some positive returns as follows, there are not hints of how to employ VIX differently according to industries.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
 <p>Finally, we thought that the time period between 2016 to 2021 may had different characteristics because it was highly likely that the COVID-19 Crisis affected each company differently, such as companies in Hlth and HiTec. Nevertheless, we should not deduce something special in the graph below. As a result, we concluded that there is not differences of the predictive capability by VIX depending on industries.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
 </div>
-<div id="analysis-of-relations-between-regions-and-vix" class="section level2" number="5.3">
-<h2><span class="header-section-number">5.3</span> Analysis of Relations Between Regions and VIX?</h2>
+<div id="analysis-of-relations-between-regions-and-vix-1" class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> Analysis of Relations Between Regions and VIX?</h2>
 <p>To conclude our question, “Are there any more appropriate regions to use VIX?”, we analyzed the return data on regions’ value-weight market portfolio in North America, Europe, Asia, and Japan. They represent the average market return in each region.</p>
 <p>The below pair-wised graph shows scatter plots, density distribution, and correlations between the VIX and the returns in regions. XX_R_n is the same definition written in the previous section. Here, stock price about companies in North America has the strongest relation with VIX, -0.42, while that for Japan has the weakest correlation, -0.242. In the scatter plot about VIX and NA_R_n, we can see the most clear in the VIX range of 40 or more. On the other hand, that for Japan has around -8% returns even in the VIX range of 40 or less.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
 <p>The graph below shows that Japanese average stock price is more durable than others, especially after 2010. Even though there were several spread of Covid-19 also in Japan, the stock price fall in 2020 is also smaller than others. It implies the economy is in a bit strange situation. This seems to make sense because Bank Of Japan has bought a lot of financial products consistently to improve its financial markets and economy since 2010.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
 <p>The boxplots and regression show that there may the threshold of VIX in 70 or more in North America, Europe, and Asia. Especially, markets in North America move more heavily when the VIX exceeds teh threshold than Europe and Asia. On the other hand, this graph makes it stand out how abnormal Japanese stock market is. It seems to have the threshold on around 80.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
 <p>The abnormality stands out more in the following graph for 2016 to 2021. It shows the market impact of Covid-19 is more powerful in North America and Asia than Europe. On the contrary, the Japanese stock market looks like VIX does not affect the market at all. However, as the pairwise analysis above indicates, there is smaller correlation at high level of significance between Japanese stock returns and VIX values.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
 
 </div>
 </div>
@@ -154,7 +160,7 @@
           </div>
         </div>
       </div>
-<a href="missing-values.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="results.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 <a href="interactive-component.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
@@ -186,7 +192,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/alexnsaunders/VIXanalysis/edit/main/05-results.Rmd",
+"link": "https://github.com/alexnsaunders/VIXanalysis/edit/main/05-results_.Rmd",
 "text": "Edit"
 },
 "history": {
@@ -194,7 +200,7 @@ gitbook.start({
 "text": null
 },
 "view": {
-"link": "https://github.com/alexnsaunders/VIXanalysis/blob/main/05-results.Rmd",
+"link": "https://github.com/alexnsaunders/VIXanalysis/blob/main/05-results_.Rmd",
 "text": null
 },
 "download": null,

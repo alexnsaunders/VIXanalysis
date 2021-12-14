@@ -24,7 +24,7 @@
 <meta name="author" content="Alex Saunders &amp; Masataka Koga" />
 
 
-<meta name="date" content="2021-12-13" />
+<meta name="date" content="2021-12-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -77,6 +77,7 @@
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a>
 <ul>
 <li class="chapter" data-level="2.1" data-path="data-sources.html"><a href="data-sources.html#vix-data"><i class="fa fa-check"></i><b>2.1</b> VIX data</a></li>
+<li class="chapter" data-level="2.2" data-path="data-sources.html"><a href="data-sources.html#stock-indices-data-we-took-from-the-fama-french-website"><i class="fa fa-check"></i><b>2.2</b> Stock indices data we took from the Fama-French website</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
@@ -153,34 +154,11 @@
 <p>The distribution of the VIX Close value:<br />
 In the graph below, the blue curve is a density curve of the data and the red curve is the density curve of normal distribution with the same mean and the same standard deviation. We can see the data is far from normally distributed with a rather extreme right skew, suggesting traders regarded that the market is not in financial crisis in the most periods.</p>
 <p><img src="finalproj_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<ol start="2" style="list-style-type: decimal">
-<li>Stock indices data we took from the Fama-French website <a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" class="uri">https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html</a> this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper <a href="https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x" class="uri">https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x</a></li>
-</ol>
+</div>
+<div id="stock-indices-data-we-took-from-the-fama-french-website" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Stock indices data we took from the Fama-French website</h2>
+<p><a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" class="uri">https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html</a> this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper <a href="https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x" class="uri">https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x</a></p>
 <p>This provides a rich dataset of daily data for which we can calculate our returns on, the data library includes returns on factors (which can be thought of as important risk characteristics (or covariances) of stock price movements) and various other portfolios such as sectors.</p>
-<p>Data collection</p>
-<p>In this section we get the data and process it a little - giving the dates consistent format and converting variable types.</p>
-<pre><code>## Rows: 50,213
-## Columns: 12
-## $ X     &lt;dbl&gt; 19260701, 19260702, 19260706, 19260707, 19260708, 19260709, 1926~
-## $ NoDur &lt;dbl&gt; 0.02, 0.29, 0.24, 0.27, 0.69, -0.39, 0.67, 0.27, -0.46, -0.36, 0~
-## $ Durbl &lt;dbl&gt; -0.28, 1.07, 0.72, 0.06, 0.05, -1.15, 1.23, 0.78, 1.92, 0.65, -0~
-## $ Manuf &lt;dbl&gt; -0.23, 0.81, 0.22, 0.23, 0.15, -1.10, 0.78, 0.25, 0.74, 0.37, -0~
-## $ Enrgy &lt;dbl&gt; 0.57, 0.64, 0.17, -0.04, 0.12, -1.60, 0.65, -1.27, 0.37, -0.54, ~
-## $ HiTec &lt;dbl&gt; -0.21, 0.36, 0.47, -0.10, 0.35, -0.73, 0.39, 0.03, 1.64, 0.95, -~
-## $ Telcm &lt;dbl&gt; -0.02, 0.26, 0.17, 0.32, 0.40, 0.21, 0.07, 0.15, 0.03, -0.01, -0~
-## $ Shops &lt;dbl&gt; -0.01, 0.01, -0.23, -0.58, -0.36, 0.40, 0.52, 0.27, 0.32, 0.25, ~
-## $ Hlth  &lt;dbl&gt; 0.97, 0.13, 0.23, 0.33, 0.91, -0.28, -0.17, 0.22, 0.57, 0.09, -0~
-## $ Utils &lt;dbl&gt; 0.61, 0.47, 0.73, 0.17, -0.20, -0.74, 0.55, 0.23, 0.20, 0.52, -0~
-## $ Other &lt;dbl&gt; 0.20, 0.10, -0.18, 0.16, 0.39, -0.25, 0.55, 0.37, 0.28, -0.23, -~
-## $ DATE  &lt;date&gt; 1926-07-01, 1926-07-02, 1926-07-06, 1926-07-07, 1926-07-08, 192~</code></pre>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-6-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
-<pre><code>## 
-##  Shapiro-Wilk normality test
-## 
-## data:  tail(df1$Mkt.RF, -5000)
-## W = 0.881, p-value &lt; 2.2e-16</code></pre>
-<p>The data on the overall market also a distribution quite different from normal - in this case the qqplot clearly shows much fatter tails than expected. The result is confirmed with a Shapiro-Wilk test which comfortably rejects the null hypothesis of normality.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 
 </div>
 </div>

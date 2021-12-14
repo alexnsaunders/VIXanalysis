@@ -24,7 +24,7 @@
 <meta name="author" content="Alex Saunders &amp; Masataka Koga" />
 
 
-<meta name="date" content="2021-12-13" />
+<meta name="date" content="2021-12-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -77,6 +77,7 @@
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a>
 <ul>
 <li class="chapter" data-level="2.1" data-path="data-sources.html"><a href="data-sources.html#vix-data"><i class="fa fa-check"></i><b>2.1</b> VIX data</a></li>
+<li class="chapter" data-level="2.2" data-path="data-sources.html"><a href="data-sources.html#stock-indices-data-we-took-from-the-fama-french-website"><i class="fa fa-check"></i><b>2.2</b> Stock indices data we took from the Fama-French website</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
@@ -118,11 +119,18 @@ Scatter plot for VIX vs the US Stock Market
 <p><button type="button" onclick="add()">Same day</button>
 <button type="button" onclick="remove()">Next Day</button></p>
 <p>
-Click on an observation to put date on the scatter
+In this interactive chart we show the difference between the same day relationship between the VIX and the market - strongly negative. And the Next Day relationship which is less clear.
+Click the buttons to click between the two views. Linear regression functionality from <a href="https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097>"> Harry Stevens</a>
 </p>
 <p>
-Button shows contemporaneous (same day returns vs VIX changes) and next day - Linear regression functionality from <a href="https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097>"> Harry Stevens</a>
+If you are interested in specific dates, you can hover over the points to show the date and click on an observation to put the date on the scatter
 </p>
+<p>
+<p>Finally to complement Masa’s work on looking at negative returns you may use the radio buttons to highlight the difference between the positive market returns and negative market returns. By selecting these options the relevant points will be colored green or red for positive and negative returns.</p>
+<p><input type="checkbox" id="Pos" onclick = "highlight()">
+<label for="Pos">Highlight Positive Returns</label>
+<input type="checkbox" id="Neg" onclick = "highlight()">
+<label for="Neg">Highlight Negative Returns</label></p>
 <script src="https://d3js.org/d3.v7.js"></script>
 <script>
 
@@ -170,6 +178,21 @@ d3.csv("https://raw.githubusercontent.com/alexnsaunders/VIXanalysis/main/df2_sma
   svg.append("g")
     .attr("transform", "translate(" + padding + ",0)")
     .call(d3.axisLeft(y));
+    
+      svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Market return 1d (%)"); 
+      
+        svg.append("text")             
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height + margin.top + 5) + ")")
+      .style("text-anchor", "middle")
+      .text("VIX Change 1d in pts");
 
   // Add dots
   svg.append('g')
@@ -215,11 +238,35 @@ d3.csv("https://raw.githubusercontent.com/alexnsaunders/VIXanalysis/main/df2_sma
     
 })
   
+function highlight() {
+if (d3.select("input#Pos").property('checked')) {
+svg.selectAll("circle").filter(function(d) {
+  return d.MktRF > 0;}).transition()
+  .duration(1000).
+  attr("fill","green")
+  }
+  else { svg.selectAll("circle").filter(function(d) {
+  return d.MktRF > 0;}).transition()
+  .duration(1000)
+  .attr("fill","blue")
+  }
+if (d3.select("input#Neg").property('checked'))  {
+  svg.selectAll("circle").filter(function(d) {
+  return d.MktRF < 0;}).transition()
+  .duration(1000)
+  .attr("fill","red")
+  }
+  else { svg.selectAll("circle").filter(function(d) {
+  return d.MktRF < 0;}).transition()
+  .duration(1000)
+  .attr("fill","blue")
+  }
+}
 
-   // Add X axis
+
 function add() {
   
-  svg.selectAll("text#reg_text").remove()
+  
   d3.selectAll("text#click_text").remove()
   
    padding = 20
@@ -253,10 +300,12 @@ function add() {
             .attr("y2", y(lg.ptB.y))
             .attr("stroke","red") 
       
-      svg.append("text")
+    svg.selectAll("text#reg_text")
+      .transition()
+         .duration(2000)
          .attr("id","reg_text")
          .attr("x", x(lg.ptA.x))
-         .attr("y", y(lg.ptA.y))
+         .attr("y", y(lg.ptA.y))         
          .text("Regression y = " +Math.round( lg.Reg.m*100)/100 +"x + "+Math.round(lg.Reg.b*100)/100)
 
     
@@ -264,7 +313,7 @@ function add() {
 }
 
 function remove() {
-  svg.selectAll("text#reg_text").remove()
+  
   d3.selectAll("text#click_text").remove()
   var x = d3.scaleLinear()
     .domain([d3.min(VIX,function(d) {return d.dVIX;}), d3.max(VIX,function(d) {return d.dVIX;})])
@@ -297,14 +346,17 @@ function remove() {
             .attr("y2", y(lg.ptB.y))
             .attr("stroke","red")
             
-         svg.append("text")
+         svg.selectAll("text#reg_text")
+      .transition()
+         .duration(2000)
          .attr("id","reg_text")
          .attr("x", x(lg.ptA.x))
          .attr("y", y(lg.ptA.y))
          .text("Regression y = " +Math.round( lg.Reg.m*100)/100 +"x + "+Math.round(lg.Reg.b*100)/100)
-
   
 }
+
+
 
 function calcLinear(data, x, y, minX, minY){
   /////////

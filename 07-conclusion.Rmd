@@ -1,2 +1,17 @@
 # Conclusion
 
+For stock investors, forecasts of sudden stock price movements are quite valuable. However, the forecast of macroeconomy changes and the effect on the price are is more difficult to predict than individual economic activities. We analyzed VIX, considered as market’s “fear gauge,” as a one way to more accurately predict this extremely unpredictable and sudden change.
+
+In conclusion, we got answers below.
+
+Q1) Can we use VIX to predict future drops of stock prices, and are there any specific types of recession periods that VIX could foresee more easily?
+
+We can employ it to precdict drops even though the power of prediction is limited in some points. In the more severe financial crisis, the VIX will work.
+
+Q2) Are there more appropriate industries to use VIX for predicting the future drops? 
+
+As far as the analysis on five industry genres in the US market, we could not find the differences of VIX prediction effect on stock returns.
+
+Q3) Are there any more appropriate regions to use VIX?
+
+The US market is the most appropriate, then Europe and Asia. Japan is the least probably because of the abnormal investment by Bank Of Japan on financial products in Japanese markets.

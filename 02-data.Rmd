@@ -47,63 +47,8 @@ ggplot(vix, aes(CLOSE)) +
 
 ```
 
+## Stock indices data we took from the Fama-French website
 
-2. Stock indices data we took from the Fama-French website https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x 
+https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x 
 
 This provides a rich dataset of daily data for which we can calculate our returns on, the data library includes returns on factors (which can be thought of as important risk characteristics (or covariances) of stock price movements) and various other portfolios such as sectors.
-
-Data collection
-
-In this section we get the data and process it a little - giving the dates consistent format and converting variable types.
-
-```{r}
-
-
-#url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
-#temp <- tempfile()
-#download.file(url,temp)
-#ind = read.csv(unz(temp,"10_Industry_Portfolios_Daily.csv"),skip=9,header=TRUE)
-#write_csv(ind),"ind.csv")
-ind = read_csv("ind.csv")
-
-#url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CS#V.zip"
-#temp1 <- tempfile()
-#download.file(url,temp1)
-#ff = read.csv(unz(temp1,"F-F_Research_Data_5_Factors_2x3_daily.CSV"),skip=3,header=TRUE)
-#write_csv(ff,"ff.csv")
-ff = read_csv("ff.csv")
-
-ind$DATE = as.Date(ind$X,format='%Y%m%d')
-#recession$DATE = as.Date(recession$date,format='$Y-$d-$m')
-ff$DATE = as.Date(as.character(ff$X),format='%Y%m%d')
-
-df1 <-  merge(vix,ff,by= c("DATE" = "DATE"))
-
-chars <- sapply(ind, is.character)
-ind[,chars] <- as.data.frame(apply(ind[,chars],2,as.numeric))
-glimpse(ind)
-
-```
-
-
-
-
-
-```{r}
-ggplot(df1,aes(Mkt.RF)) + geom_histogram(binwidth = 0.1,aes(y = ..density..)) +  geom_density(lwd = 1.5,color="blue") + stat_function(fun = dnorm, args = list(mean = mean(df1$Mkt.RF),sd = sd(df1$Mkt.RF)),color = "red", lwd = 1.5)
-
-qqnorm(df1$Mkt.RF)
-qqline(df1$Mkt.RF,colour="red")
-shapiro.test(tail(df1$Mkt.RF,-5000))
-```
-
-The data on the overall market also a distribution quite different from normal - in this case the qqplot clearly shows much fatter tails than expected. The result is confirmed with a Shapiro-Wilk test which comfortably rejects the null hypothesis of normality. 
-
-```{r}
-library(GGally)
-df <- tail(ind,2520)
-df = df[!colnames(df) %in% c('X','DATE')]
-ggpairs(df)
-```
-
-

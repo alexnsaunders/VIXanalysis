@@ -1,6 +1,7 @@
 introduction
 data-sources
 vix-data
+stock-indices-data-we-took-from-the-fama-french-website
 data-transformation
 missing-values
 results

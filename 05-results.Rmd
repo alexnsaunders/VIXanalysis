@@ -1,105 +1,9 @@
 # Results
 
 ```{r}
+library(dplyr)
 library(tidyverse)
 library(patchwork)
-library(lubridate)
-
-vix <- read.csv("https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv")
-ff <- read_csv("F-F_Research_Data_Factors_daily.csv", skip = 3, n_max = 25105)
-ind <- read_csv("5_Industry_Portfolios_Daily.csv", skip = 9, n_max = 25105)
-na <- read_csv("North_America_5_Factors_Daily.csv", skip = 6, n_max = 8132)
-erp <- read_csv("Europe_5_Factors_Daily.csv", skip = 6, n_max = 8132)
-asa <- read_csv("Asia_Pacific_ex_Japan_5_Factors_Daily.csv", skip = 6, n_max = 8132)
-jp <- read_csv("Japan_5_Factors_Daily.csv", skip = 6, n_max = 8132)
-
-ff <- ff %>% rename("Mkt.RF" = "Mkt-RF", "X" = "...1")
-ind <- ind %>% rename("X" = "...1")
-na <- na %>% rename("NA_" = "Mkt-RF", "X" = "...1") %>% select(NA_, X)
-erp <- erp %>% rename("ERP_" = "Mkt-RF", "X" = "...1") %>% select(ERP_, X)
-asa <- asa %>% rename("ASA_" = "Mkt-RF", "X" = "...1") %>% select(ASA_, X)
-jp <- jp %>% rename("JP_" = "Mkt-RF", "X" = "...1") %>% select(JP_, X)
-cnt <- merge(na, erp, by = c("X" = "X")) %>%
-  merge(asa, by = c("X" = "X")) %>% merge(jp, by = c("X" = "X"))
-
-vix$DATE <- as.Date(vix$DATE, format = '%m/%d/%Y')
-ff$DATE <- as.Date(as.character(ff$X), format = '%Y%m%d')
-ind$DATE <- as.Date(as.character(ind$X), format = '%Y%m%d')
-cnt$DATE <- as.Date(as.character(cnt$X), format = '%Y%m%d')
-
-vix <- vix %>% mutate(dVIX = CLOSE - lag(CLOSE))
-
-vix <- vix %>% filter(year(DATE) >= 2001)
-ff <- ff %>% filter(year(DATE) >= 2001)
-ind <- ind %>% filter(year(DATE) >= 2001)
-cnt <- cnt %>% filter(year(DATE) >= 2001)
-
-ff_n <- nrow(ff)
-cnt_n <- nrow(cnt)
-ff$US_V[1] <- 100 * (1 + ff$Mkt.RF[1]/100)
-ind_v <- ind
-cnt_v <- cnt
-for(j in 2:6){
-    ind_v[1, j] <- 100 * (1 + ind[1, j]/100)
-}
-for(j in 2:5){
-    cnt_v[1, j] <- 100 * (1 + cnt[1, j]/100)
-}
-for(i in 2:ff_n){
-  ff$US_V[i] <- ff$US_V[i-1] * (1 + ff$Mkt.RF[i]/100)
-  for(j in 2:6){
-    ind_v[i , j] <- ind_v[i-1, j] * (1 + ind_v[i, j]/100)
-  }
-}
-for(i in 2:cnt_n){
-  for(j in 2:5){
-    cnt_v[i , j] <- cnt_v[i-1, j] * (1 + cnt_v[i, j]/100)
-  }
-}
-
-ind_names <- ind %>% select(-c(X, DATE)) %>% names
-cnt_names <- cnt %>% select(-c(X, DATE)) %>% names
-names(ind_v) <- c("X", paste(ind_names, "V", sep = "_"), "DATE")
-names(cnt_v) <- c("X", paste(c("NA", "ERP", "ASA", "JP"),
-                             "V", sep = "_"), "DATE")
-ind <- merge(ind, ind_v, by = c("DATE" = "DATE"))
-cnt <- merge(cnt, cnt_v, by = c("DATE" = "DATE"))
-remove(ind_v)
-remove(cnt_v)
-
-ff$DATE[1:(ff_n-1)] <- ff$DATE[2:ff_n]
-ind$DATE[1:(ff_n-1)] <- ind$DATE[2:ff_n]
-cnt$DATE[1:(cnt_n-1)] <- cnt$DATE[2:cnt_n]
-ff <- ff[-ff_n,]
-ind <- ind[-ff_n,]
-cnt <- cnt[-cnt_n,]
-df <- merge(vix, ff, by = c("DATE" = "DATE")) %>%
-  merge(ind, by = c("DATE" = "DATE")) %>% merge(cnt, by = c("DATE" = "DATE"))
-df <- rename(df, US_R = Mkt.RF, VIX = CLOSE, Cnsmr_R = Cnsmr,
-             Manuf_R = Manuf, HiTec_R = HiTec, Hlth_R = Hlth,
-             Other_R = Other, NA_R = NA_, ERP_R = ERP_,
-             ASA_R = ASA_, JP_R = JP_)
-df$US_R_n <- df$US_R
-df$Cnsmr_R_n <- df$Cnsmr_R
-df$Manuf_R_n <- df$Manuf_R
-df$HiTec_R_n <- df$HiTec_R
-df$Hlth_R_n <- df$Hlth_R
-df$Other_R_n <- df$Other_R
-df$NA_R_n <- df$NA_R
-df$ERP_R_n <- df$ERP_R
-df$ASA_R_n <- df$ASA_R
-df$JP_R_n <- df$JP_R
-
-df$US_R_n[df$US_R > 0] <- 0
-df$Cnsmr_R_n[df$Cnsmr_R > 0] <- 0
-df$Manuf_R_n[df$Manuf_R > 0] <- 0
-df$HiTec_R_n[df$HiTec_R > 0] <- 0
-df$Hlth_R_n[df$Hlth_R > 0] <- 0
-df$Other_R_n[df$Other_R > 0] <- 0
-df$NA_R_n[df$NA_R > 0] <- 0
-df$ERP_R_n[df$ERP_R > 0] <- 0
-df$ASA_R_n[df$ASA_R > 0] <- 0
-df$JP_R_n[df$JP_R > 0] <- 0
 
 max_VIX <- max(df$VIX)
 max_dVIX <- max(df$dVIX)
@@ -112,7 +16,8 @@ min_cnt <- min(df$NA_R, df$ERP_R, df$ASA_R, df$JP_R)
 
 ## VIX Prediction for Future Crisis in Different Time Periods
 
-To analyze the VIX and average stock return data in US markets, we first compared them in the graph below. The blue line shows VIX value, the red curve is the non-parametric loess smoother for VIX value, the swinging line around zero represents US average portfolio return (%), and the periods colored by green indicate high VIX time range. This graph clearly shows that high VIX leads to high volatility on the US average stock return. Especially, more highly VIX causes intense fluctuations of the return.
+To analyze the VIX and average stock return data in US markets, we first compared them in the graph below. The blue line shows VIX value, the red curve is the non-parametric loess smoother for VIX value, the swinging line around zero represents US average portfolio return (%), and the periods colored by green indicate high VIX periods. Hereafter, xx_R like US_R means the return data. This graph clearly shows that high VIX leads to high volatility of the US average stock return. Especially, a very high VIX causes intense fluctuations of the return.
+
 ```{r}
 df_c <- df %>% select(US_R, DATE, VIX) %>%
   gather(key, Value, -DATE)
@@ -146,7 +51,7 @@ ggplot() +
   theme_grey(16)
 ```
 
-Then, the graph below shows comparison between VIX and actual cumulative changes of US average portfolio value. We can see high VIX leads to not only high volatility but also huge fall of stock values. Especially, from August 2008 to June 2009 and from February 2020 to February 2021, there are comparably high VIX values and sharpe plunges of stock values. Since they are the periods of the 2008 financial crisis and the COVID-19 Crisis, there must be the existence of trader's fears for markets.
+The graph below shows comparison between VIX and actual cumulative changes of US average portfolio value. Hereafter, xx_V like US_V means the value data. We can see a high VIX leads to not only high volatility but also huge fall of stock values. Especially, from August 2008 to June 2009 and from February 2020 to February 2021, there are comparably high VIX values and sharp plunges of stock values. Since they are the periods of the 2008 financial crisis and the COVID-19 Crisis, times we know were of great worry and uncertainty in markets, the VIX must be capturing trader's fears.
 
 ```{r}
 df_c <- df %>% select(DATE, US_V, VIX) %>%
@@ -181,7 +86,7 @@ ggplot()  +
   theme_grey(16)
 ```
 
-The next graph with boxplots and regression curve tells us implications about concrete threshold of VIX values indicating the high level of concerns in the market. US_R_n on y axis is non-positive values of US average stock returns, which means the US average stock returns whose positive values were changed to zero. We basically focused on this non-positive values because our goal is to confirm the possibility of VIX usages to avoid investment risks, not to improve total trading return. The graph indicates clear negative correlation with narrow confidence interval between the return and VIX. Also, the boxplots imply that about 70 or more VIX values have strong potential of market crisis. This implication makes sense because only the 2008 financial crisis and the COVID-19 Crisis caused such a high values from 2001 to date.
+The next graph with boxplots and a regression curve tells us implications about concrete threshold of VIX values indicating the high level of concerns in the market. US_R_n on y axis is non-positive values of US average stock returns, which means the US average stock returns whose positive values were changed to zero. We focused on these non-positive values because our goal is to confirm the possibility of using the VIX to avoid investment risks, not to improve total trading return. The graph indicates clear negative correlation with narrow confidence interval between the return and VIX. Also, the boxplots imply that above 70 or more VIX values have strong potential of market crisis. This implication makes sense because only the 2008 financial crisis and the COVID-19 Crisis caused such a high values from 2001 to date.
 
 
 ```{r}

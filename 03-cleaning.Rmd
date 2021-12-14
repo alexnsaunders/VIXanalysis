@@ -1,6 +1,132 @@
 # Data transformation
 
+In this section we get the data and process it a little - giving the dates consistent format and converting variable types.
+
 ```{r}
+library(dplyr)
+library(tidyverse)
+library(lubridate)
+
+vix <- read.csv("https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv")
+ff <- read_csv("F-F_Research_Data_Factors_daily.csv", skip = 3, n_max = 25105)
+ind <- read_csv("5_Industry_Portfolios_Daily.csv", skip = 9, n_max = 25105)
+na <- read_csv("North_America_5_Factors_Daily.csv", skip = 6, n_max = 8132)
+erp <- read_csv("Europe_5_Factors_Daily.csv", skip = 6, n_max = 8132)
+asa <- read_csv("Asia_Pacific_ex_Japan_5_Factors_Daily.csv", skip = 6, n_max = 8132)
+jp <- read_csv("Japan_5_Factors_Daily.csv", skip = 6, n_max = 8132)
+
+ff <- ff %>% rename("Mkt.RF" = "Mkt-RF", "X" = "...1")
+ind <- ind %>% rename("X" = "...1")
+na <- na %>% rename("NA_" = "Mkt-RF", "X" = "...1") %>% select(NA_, X)
+erp <- erp %>% rename("ERP_" = "Mkt-RF", "X" = "...1") %>% select(ERP_, X)
+asa <- asa %>% rename("ASA_" = "Mkt-RF", "X" = "...1") %>% select(ASA_, X)
+jp <- jp %>% rename("JP_" = "Mkt-RF", "X" = "...1") %>% select(JP_, X)
+cnt <- merge(na, erp, by = c("X" = "X")) %>%
+  merge(asa, by = c("X" = "X")) %>% merge(jp, by = c("X" = "X"))
+
+vix$DATE <- as.Date(vix$DATE, format = '%m/%d/%Y')
+ff$DATE <- as.Date(as.character(ff$X), format = '%Y%m%d')
+ind$DATE <- as.Date(as.character(ind$X), format = '%Y%m%d')
+cnt$DATE <- as.Date(as.character(cnt$X), format = '%Y%m%d')
+
+vix <- vix %>% mutate(dVIX = CLOSE - lag(CLOSE))
+
+vix <- vix %>% filter(year(DATE) >= 2001)
+ff <- ff %>% filter(year(DATE) >= 2001)
+ind <- ind %>% filter(year(DATE) >= 2001)
+cnt <- cnt %>% filter(year(DATE) >= 2001)
+
+ff_n <- nrow(ff)
+cnt_n <- nrow(cnt)
+ff$US_V[1] <- 100 * (1 + ff$Mkt.RF[1]/100)
+ind_v <- ind
+cnt_v <- cnt
+for(j in 2:6){
+    ind_v[1, j] <- 100 * (1 + ind[1, j]/100)
+}
+for(j in 2:5){
+    cnt_v[1, j] <- 100 * (1 + cnt[1, j]/100)
+}
+for(i in 2:ff_n){
+  ff$US_V[i] <- ff$US_V[i-1] * (1 + ff$Mkt.RF[i]/100)
+  for(j in 2:6){
+    ind_v[i , j] <- ind_v[i-1, j] * (1 + ind_v[i, j]/100)
+  }
+}
+for(i in 2:cnt_n){
+  for(j in 2:5){
+    cnt_v[i , j] <- cnt_v[i-1, j] * (1 + cnt_v[i, j]/100)
+  }
+}
+
+ind_names <- ind %>% select(-c(X, DATE)) %>% names
+cnt_names <- cnt %>% select(-c(X, DATE)) %>% names
+names(ind_v) <- c("X", paste(ind_names, "V", sep = "_"), "DATE")
+names(cnt_v) <- c("X", paste(c("NA", "ERP", "ASA", "JP"),
+                             "V", sep = "_"), "DATE")
+ind <- merge(ind, ind_v, by = c("DATE" = "DATE"))
+cnt <- merge(cnt, cnt_v, by = c("DATE" = "DATE"))
+remove(ind_v)
+remove(cnt_v)
+
+ff$DATE[1:(ff_n-1)] <- ff$DATE[2:ff_n]
+ind$DATE[1:(ff_n-1)] <- ind$DATE[2:ff_n]
+cnt$DATE[1:(cnt_n-1)] <- cnt$DATE[2:cnt_n]
+ff <- ff[-ff_n,]
+ind <- ind[-ff_n,]
+cnt <- cnt[-cnt_n,]
+df <- merge(vix, ff, by = c("DATE" = "DATE")) %>%
+  merge(ind, by = c("DATE" = "DATE")) %>% merge(cnt, by = c("DATE" = "DATE"))
+df <- rename(df, US_R = Mkt.RF, VIX = CLOSE, Cnsmr_R = Cnsmr,
+             Manuf_R = Manuf, HiTec_R = HiTec, Hlth_R = Hlth,
+             Other_R = Other, NA_R = NA_, ERP_R = ERP_,
+             ASA_R = ASA_, JP_R = JP_)
+df$US_R_n <- df$US_R
+df$Cnsmr_R_n <- df$Cnsmr_R
+df$Manuf_R_n <- df$Manuf_R
+df$HiTec_R_n <- df$HiTec_R
+df$Hlth_R_n <- df$Hlth_R
+df$Other_R_n <- df$Other_R
+df$NA_R_n <- df$NA_R
+df$ERP_R_n <- df$ERP_R
+df$ASA_R_n <- df$ASA_R
+df$JP_R_n <- df$JP_R
+
+df$US_R_n[df$US_R > 0] <- 0
+df$Cnsmr_R_n[df$Cnsmr_R > 0] <- 0
+df$Manuf_R_n[df$Manuf_R > 0] <- 0
+df$HiTec_R_n[df$HiTec_R > 0] <- 0
+df$Hlth_R_n[df$Hlth_R > 0] <- 0
+df$Other_R_n[df$Other_R > 0] <- 0
+df$NA_R_n[df$NA_R > 0] <- 0
+df$ERP_R_n[df$ERP_R > 0] <- 0
+df$ASA_R_n[df$ASA_R > 0] <- 0
+df$JP_R_n[df$JP_R > 0] <- 0
+
+
+ind = read_csv("ind.csv")
+
+#url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CS#V.zip"
+#temp1 <- tempfile()
+#download.file(url,temp1)
+#ff = read.csv(unz(temp1,"F-F_Research_Data_5_Factors_2x3_daily.CSV"),skip=3,header=TRUE)
+#write_csv(ff,"ff.csv")
+ff = read_csv("ff.csv")
+
+ind$DATE = as.Date(ind$X,format='%Y%m%d')
+#recession$DATE = as.Date(recession$date,format='$Y-$d-$m')
+ff$DATE = as.Date(as.character(ff$X),format='%Y%m%d')
+
+df1 <-  merge(vix,ff,by= c("DATE" = "DATE"))
+
+chars <- sapply(ind, is.character)
+ind[,chars] <- as.data.frame(apply(ind[,chars],2,as.numeric))
+
+
+df_base <- df %>% select(VIX, US_R, Cnsmr_R, Manuf_R, HiTec_R, 
+                         Hlth_R, Other_R, NA_R, ERP_R, ASA_R, JP_R)
+
+glimpse(df_base)
 
 ```
 
