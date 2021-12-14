@@ -48,13 +48,18 @@ ggplot(vix, aes(CLOSE)) +
 ```
 
 
-2. Stock indices data we took from the Fama-French website https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html this is a well known dataset that has been used by many academics for asset pricing tests, not least the original Journal of Finance paper https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x 
+## Stock indices 
+For the stock market data we used the Fama-French website:
 
-This provides a rich dataset of daily data for which we can calculate our returns on, the data library includes returns on factors (which can be thought of as important risk characteristics (or covariances) of stock price movements) and various other portfolios such as sectors.
+https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html 
+
+This is a well known dataset that has been used by many academics for asset pricing tests, not least the original [Journal of Finance paper](https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x) 
+
+This provides a rich dataset of daily data for which we can calculate our returns on, the data library includes returns on regional markets and industries.
 
 Data collection
 
-In this section we get the data and process it a little - giving the dates consistent format and converting variable types.
+In this section we give an example of how we collect the data and process it - giving the dates consistent format and converting variable types.
 
 ```{r}
 

@@ -59,6 +59,21 @@ d3.csv("https://raw.githubusercontent.com/alexnsaunders/VIXanalysis/main/df2_sma
   svg.append("g")
     .attr("transform", "translate(" + padding + ",0)")
     .call(d3.axisLeft(y));
+    
+      svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Market return 1d (%)"); 
+      
+        svg.append("text")             
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height + margin.top + 5) + ")")
+      .style("text-anchor", "middle")
+      .text("VIX Change 1d in pts");
 
   // Add dots
   svg.append('g')

@@ -1,3 +1,77 @@
 # Missing values
 
-Since we searched and collected data as clean as possible, there was not any missing data.
+Since we searched and collected data as clean as possible, there was not any missing data. We checked this using the function built in a previos porblem set.
+
+```{r}
+library(patchwork)
+plot_missing <- function(data, percent = FALSE){
+  missing_patterns <- data.frame(is.na(data)) %>%
+    group_by_all() %>%
+    count(name = "count", sort = TRUE) %>%
+    ungroup()
+  
+  missing_patterns %<>% mutate(ratio = count/sum(count) * 100) %<>%
+    rownames_to_column("m_pattern") %>% 
+    mutate(m_pattern = factor(m_pattern, as.character(1:nrow(missing_patterns))))
+  
+  tidydata <- missing_patterns %>%
+    gather(key, value, -c(m_pattern, count, ratio)) %>% 
+    mutate(key = factor(key, levels = unique(key)),
+           key = fct_reorder(key, value, function(x) sum(x * count), .desc = TRUE),
+           missing = factor(value, c("TRUE", "FALSE", "ALL_FALSE")))
+  
+  all_f_n <- tidydata %>% group_by(m_pattern) %>%
+    summarise(l = !as.logical(mean(value))) %>% subset(.$l) %>%
+    .$m_pattern %>% as.integer()
+  tidydata[tidydata$m_pattern == all_f_n, "missing"] <- "ALL_FALSE"
+  
+  
+  var_n <- tidydata %>% select(key) %>% unique() %>% nrow()
+  m_pattern_n <- tidydata %>% select(m_pattern) %>% unique() %>% nrow()
+  p1 <- ggplot(tidydata, aes(x = key, y = fct_rev(m_pattern), fill = missing)) +
+    geom_tile(color = "white") +
+    scale_fill_manual(values = c("TRUE" = "#A67FFB", "FALSE" = "grey80",
+                                 "ALL_FALSE" = "grey65")) +
+    labs(x = "variable", y = "missing pattern") +
+    annotate("text", x = (var_n + 1) / 2, y = m_pattern_n - all_f_n + 1,
+             hjust = 0.5, vjust = 0.5, label = "complete cases") +
+    theme_classic() +
+    theme(legend.position = "none")
+  
+  
+  colors <- rep("#5080FA", m_pattern_n)
+  colors[m_pattern_n - all_f_n + 1] <- "#0126FF"
+  p2 <- ggplot(missing_patterns,
+               aes(y = fct_rev(m_pattern),
+                   weight = if(percent) ratio else count)) +
+    geom_bar(fill = colors, alpha = 0.7) +
+    scale_x_continuous(limits = c(0, if(percent) 100 else max(5, tidydata$count)),
+                       n.breaks = if(percent) 5 else 3) +
+    theme_classic() +
+    theme(panel.background = element_rect(colour = "black", size = 0.3),
+          panel.grid.major.x = element_line(color = "gray60"),
+          panel.grid.minor.x = element_line(color = "gray60", linetype = 3)) +
+    labs(x = if(percent) "% rows" else "row count", y = "")
+  
+  
+  tidydata %<>% mutate(NA_count = count * value) %>% group_by(key) %>%
+    summarise(sum = sum(NA_count)) %>% mutate(ratio = sum / nrow(data) * 100)
+  p3 <- ggplot(tidydata, aes(x = key, weight = if(percent) ratio else sum)) +
+    geom_bar(fill = rep("#5080FA", var_n), alpha = 0.7) +
+    scale_y_continuous(limits = c(0, if(percent) 100 else max(5, tidydata$sum)),
+                       n.breaks = if(percent) 5 else 3) +
+    theme_classic() +
+    theme(panel.background = element_rect(colour = "black", size = 0.3),
+          panel.grid.major.y = element_line(color = "gray60"),
+          panel.grid.minor.y = element_line(color = "gray60", linetype = 3)) +
+    labs(subtitle = "Missing value patterns",
+         x = "", y = if(percent) "% rows \n missing:" else "num rows \n missing:")
+  
+  (p3 + plot_spacer() + plot_layout(ncol = 2, widths = c(3, 1))) /
+    (p1 + p2 + plot_layout(ncol = 2, widths = c(4, 1))) +
+    plot_layout(heights = c(1, 4))
+}
+
+plot_missing(ind, percent = TRUE)
+```
+

@@ -6,3 +6,4 @@ missing-values
 results
 interactive-component
 conclusion
+stock-indices

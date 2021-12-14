@@ -1,6 +1,27 @@
 # Data transformation
 
-```{r}
+As we highlighted in the previous data section our code did not need much transformation. Both the datasets we collected were relatively clean and in the form that we wanted them. 
 
+Our main challenge was wrangling the data to a form that could be merged. The data had slightly different date formats, so we created a consistently named column on which we could perform the merge to analyze the data. 
+
+```{r, echo=TRUE}
+library(tidyverse)
+ind = read_csv("ind.csv")
+vix = read.csv("https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv")
+
+vix$DATE = as.Date(vix$DATE,format='%m/%d/%Y')
+ind$DATE = as.Date(ind$X,format='%Y%m%d') #different format
+chars <- sapply(ind, is.character) #original file read in as 
+ind[,chars] <- as.data.frame(apply(ind[,chars],2,as.numeric))
+
+df1 <-  merge(vix,ind,by= c("DATE" = "DATE"))
+
+```
+
+Once merged the only transformations we have to do is the take 1st differences so we can analyze VIX changes vs the levels and to lag our data so we can analyze market returns contemporaneously with VIX changes, and the day after the change happens.
+
+```{r}
+vix <- vix %>% mutate(dVIX = CLOSE - lag(CLOSE))
+vix <- vix %>% mutate(dVIX_t1 = lag(dVIX))
 ```
 
