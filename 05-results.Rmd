@@ -105,9 +105,12 @@ max_VIX <- max(df$VIX)
 max_dVIX <- max(df$dVIX)
 min_R <- min(df$US_R)
 max_R <- max(df$US_R)
+min_ind <- min(df$Cnsmr_R, df$Manuf_R, df$HiTec_R, df$Hlth_R, df$Other_R)
+max_ind <- max(df$Cnsmr_R, df$Manuf_R, df$HiTec_R, df$Hlth_R, df$Other_R)
+min_cnt <- min(df$NA_R, df$ERP_R, df$ASA_R, df$JP_R)
 ```
 
-Q1) Can we use VIX to predict future drops of stock prices, and are there any specific types of recession periods that VIX could foresee more easily?
+## VIX Prediction for Future Crisis in Different Time Periods
 
 To analyze the VIX and average stock return data in US markets, we first compared them in the graph below. The blue line shows VIX value, the red curve is the non-parametric loess smoother for VIX value, the swinging line around zero represents US average portfolio return (%), and the periods colored by green indicate high VIX time range. This graph clearly shows that high VIX leads to high volatility on the US average stock return. Especially, more highly VIX causes intense fluctuations of the return.
 ```{r}
@@ -174,7 +177,7 @@ ggplot()  +
            label = "Jul. 11 - Jan. 12", color = "black", hust = 0) +
   annotate("text", x = as.Date("2021-3-1") - 500, y = 350,
            label = "Feb. 20 - Feb. 21", color = "black", hust = 0) +
-  labs(subtitle = "Comparison of US Average Portfolio Value and VIX") +
+  labs(subtitle = "Comparison of US Average Stock Price and VIX") +
   theme_grey(16)
 ```
 
@@ -191,6 +194,7 @@ ggplot(df, aes(x = VIX, y = US_R_n)) +
   theme_grey(16)
 ```
 
+The following graph shows boxplots and regression of non-positive returns of US average portfolio on VIX values in four time periods with 5 year durations, 2001 to 2006, 2007 to 2011, 2012 to 2016, and 2017 to 2021. The all four periods have both relatively high VIX values and low values, and their graphs show negative relations. On the other hand, we can confirm that there are clear difference of average VIX values among the four periods. 2001 to 2006 and 2012 to 2016 do not have values higher than implicated threshold (70). However, in the two periods, 40 or more VIX leads to return falls, while around 60 or more seems to be threshold in 2007 to 2011 and 2017 to 2021. We can guess that the threshold may change in different financial circumstances because people are getting used to the bad situation when it longs. In high VIX periods, traders may not be surprised by high volatility of stock values. Additionally, we think that they probably cannot avoid to trade because investment is their work even when the risk is a bit high.
 
 ```{r}
 df2006 <- df %>% filter(year(DATE) <= 2006)
@@ -214,30 +218,18 @@ g_21 <- ggplot(df2021, aes(x = VIX, y = US_R_n)) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth() +
   xlim(0, max_VIX) + ylim(min_R, 0) + labs(subtitle = "2016-2021")
-g_06 + g_11 + g_16 + g_21
+g_06 + g_11 + g_16 + g_21 +
+  labs(subtitle = "Boxplot and Regression in Different Time Periods")
 ```
 
-```{r}
-g_06 <- ggplot(df2006, aes(x = VIX, y = US_R)) +
-  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
-  geom_boxplot(aes(group = bin)) + geom_smooth() +
-  xlim(0, max_VIX) + ylim(min_R, max_R) + labs(subtitle = "2001-2006")
-g_11 <- ggplot(df2011, aes(x = VIX, y = US_R)) +
-  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
-  geom_boxplot(aes(group = bin)) + geom_smooth() +
-  xlim(0, max_VIX) + ylim(min_R, max_R) + labs(subtitle = "2006-2011")
-g_16 <- ggplot(df2016, aes(x = VIX, y = US_R)) +
-  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
-  geom_boxplot(aes(group = bin)) + geom_smooth() +
-  xlim(0, max_VIX) + ylim(min_R, max_R) + labs(subtitle = "2011-2016")
-g_21 <- ggplot(df2021, aes(x = VIX, y = US_R)) +
-  geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
-  geom_boxplot(aes(group = bin)) + geom_smooth() +
-  xlim(0, max_VIX) + ylim(min_R, max_R) + labs(subtitle = "2016-2021")
-g_06 + g_11 + g_16 + g_21
-```
 
-Q2) Are there more appropriate industries to use VIX for predicting the future drops? 
+
+
+## Analysis of Relations Between Industries and VIX
+
+To analyze stock returns in different industries, we analyzed the return data on industries' value-weight market portfolio in the US. They represent the average market returns in each of 5 industries, Cnsmr, Manuf, HiTec, Hlth, and Other. Cnsmr means the industry comprised of Consumer Durables, Nondurables, Wholesale, Retail, and Some Services, such as Laundries and Repair Shops. Manuf includes Manufacturing, Energy, and Utilities, HiTec indicates Business Equipment, Telephone and Television Transmission, and Hlth contains Healthcare, Medical Equipment, and Drugs. Other consists of Mines, Constr, BldMt, Trans, Hotels, Bus Serv, Entertainment, and Finance.
+
+The below graph created by the ggpairs function in GGally package shows scatter plots, density distribution, and correlations between the VIX and the returns in each industry. Here, XXX_R_n means that the return is converted to non-positive values as US_R_n. We can see the high correlation between each industry and VIX. While the graph shows HiTec and Other have stonger relation with VIX than Cnsmr, Manuf, and Hlth, other information can be read by only this. 
 
 ```{r}
 library(GGally)
@@ -246,6 +238,9 @@ df_p <- df2021[names(df) %in% c("VIX", "Cnsmr_R_n", "Manuf_R_n",
 ggpairs(df_p) +
   labs(subtitle = "Pairwise Analysis for VIX and Non-positive Return in Each Industry")
 ```
+
+
+The below graph shows changes of VIX and cumulative changes of average portfolio value in each industry in the US. Here, since the purpose of the graph is not to confirm actual VIX value but to compare it with the returns, we multiplied 5 to VIX value and deducted 400 from it to show the value and all returns in one graph. From this graph, we could not obtain useful characteristics to conclude that there are the differences of relations VIX and the returns in each industry.
 
 ```{r}
 df_V5 <- df %>% mutate(VIX = VIX * 5 - 400)
@@ -278,83 +273,110 @@ ggplot() +
            label = "Jul. 11 - Jan. 12", color = "black", hust = 0) +
   annotate("text", x = as.Date("2021-3-1") - 500, y = -20,
            label = "Feb. 20 - Feb. 21", color = "black", hust = 0) +
-  labs(subtitle = "Comparison of US Value and VIX") +
+  labs(subtitle = "Comparison of VIX and Average Prices in Each Industry") +
   theme_grey(16)
 ```
+
+Then, we confirmed boxplots and regression curves in the following graph. While it exhibits strong negative relationships like the above analysis about all US average stock portfolio, especially on 70 or more VIX values, the boxplots did not provide distict differences among industries.
+
 ```{r}
 g_c <- ggplot(df, aes(x = VIX, y = Cnsmr_R_n)) +
+  xlim(0, max_VIX) + ylim(min_ind, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_m <- ggplot(df, aes(x = VIX, y = Manuf_R_n)) +
+  xlim(0, max_VIX) + ylim(min_ind, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_hi <- ggplot(df, aes(x = VIX, y = HiTec_R_n)) +
+  xlim(0, max_VIX) + ylim(min_ind, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_hl <- ggplot(df, aes(x = VIX, y = Hlth_R_n)) +
+  xlim(0, max_VIX) + ylim(min_ind, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_o <- ggplot(df, aes(x = VIX, y = Other_R_n)) +
+  xlim(0, max_VIX) + ylim(min_ind, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
-g_c + g_m + g_hi + g_hl + g_o
+g_c + g_m + g_hi + g_hl + g_o +
+  plot_annotation(title = "Boxplot and Regression in Different Industries")
 
 ```
 
+Although we attempted to describe the original return data with some positive returns as follows, there are not hints of how to employ VIX differently according to industries.
+
 ```{r}
-###bimyou
 g_c <- ggplot(df, aes(x = VIX, y = Cnsmr_R)) +
+  xlim(0, max_VIX) + ylim(min_ind, max_ind) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_m <- ggplot(df, aes(x = VIX, y = Manuf_R)) +
+  xlim(0, max_VIX) + ylim(min_ind, max_ind) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_hi <- ggplot(df, aes(x = VIX, y = HiTec_R)) +
+  xlim(0, max_VIX) + ylim(min_ind, max_ind) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_hl <- ggplot(df, aes(x = VIX, y = Hlth_R)) +
+  xlim(0, max_VIX) + ylim(min_ind, max_ind) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_o <- ggplot(df, aes(x = VIX, y = Other_R)) +
+  xlim(0, max_VIX) + ylim(min_ind, max_ind) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
-g_c + g_m + g_hi + g_hl + g_o
+g_c + g_m + g_hi + g_hl + g_o +
+  plot_annotation(title = "Boxplot and Regression of Original Return in Different Industries")
 ```
+
+Finally, we thought that the time period between 2016 to 2021 may had different characteristics because it was highly likely that the COVID-19 Crisis affected each company differently, such as companies in Hlth and HiTec. Nevertheless, we should not deduce something special in the graph below. As a result, we concluded that there is not differences of the predictive capability by VIX depending on industries.
+
 ```{r}
+min_ind_21 <- min(df2021$Cnsmr_R, df2021$Manuf_R,
+                  df2021$HiTec_R, df2021$Hlth_R, df2021$Other_R)
+
 g_c <- ggplot(df2021, aes(x = VIX, y = Cnsmr_R_n)) +
+  xlim(0, max_VIX) + ylim(min_ind_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_m <- ggplot(df2021, aes(x = VIX, y = Manuf_R_n)) +
+  xlim(0, max_VIX) + ylim(min_ind_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_hi <- ggplot(df2021, aes(x = VIX, y = HiTec_R_n)) +
+  xlim(0, max_VIX) + ylim(min_ind_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_hl <- ggplot(df2021, aes(x = VIX, y = Hlth_R_n)) +
+  xlim(0, max_VIX) + ylim(min_ind_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_o <- ggplot(df2021, aes(x = VIX, y = Other_R_n)) +
+  xlim(0, max_VIX) + ylim(min_ind_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
-g_c + g_m + g_hi + g_hl + g_o
+g_c + g_m + g_hi + g_hl + g_o +
+  plot_annotation(title = "Boxplot and Regression in Industries in 2016-2021")
 ```
 
 
+## Analysis of Relations Between Regions and VIX?
 
+To conclude our question, "Are there any more appropriate regions to use VIX?", we analyzed the return data on regions' value-weight market portfolio in North America, Europe, Asia, and Japan. They represent the average market return in each region.
 
-
-Q3) Are there any more appropriate regions to use VIX?
-
-To answer this question, we analyzed the return data on regions' value-weight market portfolio in North America, Europe, Asia, and Japan. They represent the average market return in each area.
-
-The below graph created by the ggpairs function in GGally package shows scatter plots, density distribution, and correlations between the VIX and the returns. 
+The below pair-wised graph shows scatter plots, density distribution, and correlations between the VIX and the returns in regions. XX_R_n is the same definition written in the previous section. Here, stock price about companies in North America has the strongest relation with VIX, -0.42, while that for Japan has the weakest correlation, -0.242. In the scatter plot about VIX and NA_R_n, we can see the most clear in the VIX range of 40 or more. On the other hand, that for Japan has around -8% returns even in the VIX range of 40 or less.
 
 ```{r}
 df_p <- df[names(df) %in% c("VIX", "NA_R_n", "ERP_R_n",
                             "ASA_R_n", "JP_R_n")]
 ggpairs(df_p) +
-  labs(subtitle = "Pairwise Analysis for VIX and Non-positive Return in Each Area")
+  labs(subtitle = "Pairwise Analysis for VIX and Non-positive Return in Each Region")
 ```
+
+The graph below shows that Japanese average stock price is more durable than others, especially after 2010. Even though there were several spread of Covid-19 also in Japan, the stock price fall in 2020 is also smaller than others. It implies the economy is in a bit strange situation. This seems to make sense because Bank Of Japan has bought a lot of financial products consistently to improve its financial markets and economy since 2010.
 
 ```{r}
 df_V5 <- df %>% mutate(VIX = VIX * 5 - 400)
@@ -386,52 +408,56 @@ ggplot() +
            label = "Jul. 11 - Jan. 12", color = "black", hust = 0) +
   annotate("text", x = as.Date("2021-3-1") - 500, y = -20,
            label = "Feb. 20 - Feb. 21", color = "black", hust = 0) +
-  labs(subtitle = "Comparison of US Value and VIX") +
+  labs(subtitle = "Comparison of VIX and Average Prices in Each Region") +
   theme_grey(16)
 ```
+
+The boxplots and regression show that there may the threshold of VIX in 70 or more in North America, Europe, and Asia. Especially, markets in North America move more heavily when the VIX exceeds teh threshold than Europe and Asia. On the other hand, this graph makes it stand out how abnormal Japanese stock market is. It seems to have the threshold on around 80.
+
 ```{r}
 g_na <- ggplot(df, aes(x = VIX, y = NA_R_n)) +
+  xlim(0, max_VIX) + ylim(min_cnt, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_erp <- ggplot(df, aes(x = VIX, y = ERP_R_n)) +
+  xlim(0, max_VIX) + ylim(min_cnt, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_asa <- ggplot(df, aes(x = VIX, y = ASA_R_n)) +
+  xlim(0, max_VIX) + ylim(min_cnt, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_jp <- ggplot(df, aes(x = VIX, y = JP_R_n)) +
+  xlim(0, max_VIX) + ylim(min_cnt, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
-g_na + g_erp + g_asa + g_jp
+g_na + g_erp + g_asa + g_jp +
+  plot_annotation(title = "Boxplot and Regression in Different Regions")
+
 
 ```
 
+The abnormality stands out more in the following graph for 2016 to 2021. It shows the market impact of Covid-19 is more powerful in North America and Asia than Europe. On the contrary, the Japanese stock market looks like VIX does not affect the market at all. However, as the pairwise analysis above indicates, there is smaller correlation at high level of significance between Japanese stock returns and VIX values.
+
 ```{r}
+min_cnt_21 <- min(df2021$NA_R, df2021$ERP_R, df2021$ASA_R, df2021$JP_R)
+
 g_na <- ggplot(df2021, aes(x = VIX, y = NA_R_n)) +
+  xlim(0, max_VIX) + ylim(min_cnt_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_erp <- ggplot(df2021, aes(x = VIX, y = ERP_R_n)) +
+  xlim(0, max_VIX) + ylim(min_cnt_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_asa <- ggplot(df2021, aes(x = VIX, y = ASA_R_n)) +
+  xlim(0, max_VIX) + ylim(min_cnt_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
 g_jp <- ggplot(df2021, aes(x = VIX, y = JP_R_n)) +
+  xlim(0, max_VIX) + ylim(min_cnt_21, 0) +
   geom_point(alpha = 0.2, shape = 1, position = "jitter")  +
   geom_boxplot(aes(group = bin)) + geom_smooth()
-g_na + g_erp + g_asa + g_jp
+g_na + g_erp + g_asa + g_jp +
+  plot_annotation(title = "Boxplot and Regression in Regions in 2016-2021")
 ```
-
-
-<!-- So we can see a slight correlation - now we look at changes in the VIX vs changes in returns. -->
-
-<!-- ```{r} -->
-
-
-<!-- df1 <- df %>% mutate(dVIX=VIX - lag(VIX)) -->
-<!-- ggplot(df1,aes(x=dVIX,y=US_Return)) + geom_point( alpha = 0.2,shape=1,position = "jitter") + geom_smooth() -->
-
-<!-- df2 <- df1 %>% mutate(dVIX_t1=lag(dVIX)) -->
-<!-- ggplot(df2,aes(x=dVIX_t1,y=US_Return)) + geom_point( alpha = 0.2,shape=1,position = "jitter") + geom_smooth() -->
-<!-- ``` -->
-

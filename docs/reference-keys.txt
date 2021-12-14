@@ -4,5 +4,8 @@ vix-data
 data-transformation
 missing-values
 results
+vix-prediction-for-future-crisis-in-different-time-periods
+analysis-of-relations-between-industries-and-vix
+analysis-of-relations-between-regions-and-vix
 interactive-component
 conclusion
