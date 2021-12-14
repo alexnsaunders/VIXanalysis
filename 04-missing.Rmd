@@ -1,1 +1,3 @@
 # Missing values
+
+Since we searched and collected data as clean as possible, there was not any missing data.

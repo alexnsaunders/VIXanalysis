@@ -17,7 +17,7 @@ Q1) Can we use VIX to predict future drops of stock prices, and are there any sp
 
 Q2) Are there more appropriate industries to use VIX for predicting the future drops? 
 
-Q3) Are there any other appropriate characteristics of companies, such as company size, each company geography (ex. Americas, Europe, and Africa), and each company theme (ex. ESG, Value, Growth, and developed, emerging, and frontier markets), to use VIX for predicting future drops?
+Q3) Are there any more appropriate regions to use VIX?
 
 We collected daily VIX data from Cboe Global Markets, Inc. (https://www.cboe.com/tradable_products/vix/vix_historical_data/) and stock indices data from S&P Dow Jones Indices LLC (https://www.spglobal.com/spdji/en/index-finder/).
 

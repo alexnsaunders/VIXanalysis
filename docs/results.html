@@ -105,33 +105,34 @@
 <div id="results" class="section level1" number="5">
 <h1><span class="header-section-number">Chapter 5</span> Results</h1>
 <p>Q1) Can we use VIX to predict future drops of stock prices, and are there any specific types of recession periods that VIX could foresee more easily?</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>To analyze the VIX and average stock return data in US markets, we first compared them in the graph below. The blue line shows VIX value, the red curve is the non-parametric loess smoother for VIX value, the swinging line around zero represents US average portfolio return (%), and the periods colored by green indicate high VIX time range. This graph clearly shows that high VIX leads to high volatility on the US average stock return. Especially, more highly VIX causes intense fluctuations of the return.
+<img src="finalproj_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>Then, the graph below shows comparison between VIX and actual cumulative changes of US average portfolio value. We can see high VIX leads to not only high volatility but also huge fall of stock values. Especially, from August 2008 to June 2009 and from February 2020 to February 2021, there are comparably high VIX values and sharpe plunges of stock values. Since they are the periods of the 2008 financial crisis and the COVID-19 Crisis, there must be the existence of trader’s fears for markets.</p>
 <p><img src="finalproj_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>The next graph with boxplots and regression curve tells us implications about concrete threshold of VIX values indicating the high level of concerns in the market. US_R_n on y axis is non-positive values of US average stock returns, which means the US average stock returns whose positive values were changed to zero. We basically focused on this non-positive values because our goal is to confirm the possibility of VIX usages to avoid investment risks, not to improve total trading return. The graph indicates clear negative correlation with narrow confidence interval between the return and VIX. Also, the boxplots imply that about 70 or more VIX values have strong potential of market crisis. This implication makes sense because only the 2008 financial crisis and the COVID-19 Crisis caused such a high values from 2001 to date.</p>
 <p><img src="finalproj_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-16-1.png" width="672" />
-<img src="finalproj_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>Q2) Are there more appropriate industries to use VIX for predicting the future drops?</p>
 <p><img src="finalproj_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
-<p>Q2) Are there more appropriate industries to use VIX for predicting the future drops?
-<img src="finalproj_files/figure-html/unnamed-chunk-19-1.png" width="672" />
+<p><img src="finalproj_files/figure-html/unnamed-chunk-19-1.png" width="672" />
 <img src="finalproj_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <p><img src="finalproj_files/figure-html/unnamed-chunk-21-1.png" width="672" />
 <img src="finalproj_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<p>Q3) Are there any more appropriate regions to use VIX?</p>
+<p>To answer this question, we analyzed the return data on regions’ value-weight market portfolio in North America, Europe, Asia, and Japan. They represent the average market return in each area.</p>
+<p>The below graph created by the ggpairs function in GGally package shows scatter plots, density distribution, and correlations between the VIX and the returns.</p>
 <p><img src="finalproj_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
-<p>Q3) Are there any other appropriate characteristics of companies, such as company size, each company geography (ex. Americas, Europe, and Africa), and each company theme (ex. ESG, Value, Growth, and developed, emerging, and frontier markets), to use VIX for predicting future drops?
-<img src="finalproj_files/figure-html/unnamed-chunk-25-1.png" width="672" />
-<img src="finalproj_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-28-1.png" width="672" />
-<img src="finalproj_files/figure-html/unnamed-chunk-29-1.png" width="672" />
-<img src="finalproj_files/figure-html/unnamed-chunk-30-1.png" width="672" />
-<img src="finalproj_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
-<p>So we can see a slight correlation - now we look at changes in the VIX vs changes in returns.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-37-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-37-2.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-24-1.png" width="672" />
+<img src="finalproj_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<!-- So we can see a slight correlation - now we look at changes in the VIX vs changes in returns. -->
+<!-- ```{r} -->
+<!-- df1 <- df %>% mutate(dVIX=VIX - lag(VIX)) -->
+<!-- ggplot(df1,aes(x=dVIX,y=US_Return)) + geom_point( alpha = 0.2,shape=1,position = "jitter") + geom_smooth() -->
+<!-- df2 <- df1 %>% mutate(dVIX_t1=lag(dVIX)) -->
+<!-- ggplot(df2,aes(x=dVIX_t1,y=US_Return)) + geom_point( alpha = 0.2,shape=1,position = "jitter") + geom_smooth() -->
+<!-- ``` -->
 
 </div>
             </section>
